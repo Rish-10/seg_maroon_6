@@ -42,6 +42,11 @@ Seed the development database with:
 $ python3 manage.py seed
 ```
 
+Run the server with:
+```
+$ python3 manage.py runserver
+```
+
 Run all tests with:
 ```
 $ python3 manage.py test
