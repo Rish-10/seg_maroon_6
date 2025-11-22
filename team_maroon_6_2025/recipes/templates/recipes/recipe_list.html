@@ -1,0 +1,19 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div>
+    <h1>Recipe List</h1>
+    <p><a href="{% url 'recipe_create' %}"></a></p>
+
+    {% for recipe in recipes %}
+        <div>
+            <article>
+                <h2><a href="{% url 'recipe_detail' recipe.pk %}">{{ recipe.title }}</a></h2>
+                <p>by {{ recipe.author.username }} | {{ recipe.created_at|date:"d M Y H:i" }}</p>
+                <p>{{ recipe.description|default:"No description" }}</p>
+            </article>
+        </div>
+    {% empty %}
+        <p>No recipes yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

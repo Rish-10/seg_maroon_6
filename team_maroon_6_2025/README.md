@@ -18,7 +18,7 @@ The deployed version of the application can be found at [*enter url here*](*ente
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  The project source code has been developed using Python 3.12, so you are recommended to use the same version.  From the root of the project:
 
 ```
-$ python3.12 -m venv venv
+$ python3 -m venv venv
 $ source venv/bin/activate
 ```
 
@@ -45,6 +45,7 @@ $ python3 manage.py seed
 Run the server with:
 ```
 $ python3 manage.py runserver
+http://127.0.0.1:8000/dashboard/
 ```
 
 Run all tests with:

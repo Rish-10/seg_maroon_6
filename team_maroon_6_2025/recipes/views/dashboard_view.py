@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from recipes.models import Recipe
 
 
 @login_required
@@ -14,4 +15,15 @@ def dashboard(request):
     """
 
     current_user = request.user
-    return render(request, 'dashboard.html', {'user': current_user})
+    recipes = (
+        Recipe.objects.select_related("author")
+        .order_by("-created_at")
+    )
+    return render(
+        request,
+        'dashboard.html',
+        {
+            'user': current_user,
+            'recipes': recipes,
+        },
+    )
