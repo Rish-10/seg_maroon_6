@@ -1,0 +1,40 @@
+{% extends 'base_content.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h1>Create a Recipe</h1>
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Title</label>
+                    {{ form.title|add_class:"form-control" }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Description</label>
+                    {{ form.description|add_class:"form-control" }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Ingredients</label>
+                    {{ form.ingredients|add_class:"form-control" }}
+                    <small class="text-muted">Enter one ingredient per line</small>
+                </div>
+
+                <div class="mb-3">
+                    <label>Instructions</label>
+                    {{ form.instructions|add_class:"form-control" }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{% url 'recipe_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

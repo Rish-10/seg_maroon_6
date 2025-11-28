@@ -1,19 +1,40 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div>
-    <h1>Recipe List</h1>
-    <p><a href="{% url 'recipe_create' %}"></a></p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Recipes</h1>
+        <a href="{% url 'recipe_create' %}" class="btn btn-primary">Create Recipe</a>
+    </div>
 
-    {% for recipe in recipes %}
-        <div>
-            <article>
-                <h2><a href="{% url 'recipe_detail' recipe.pk %}">{{ recipe.title }}</a></h2>
-                <p>by {{ recipe.author.username }} | {{ recipe.created_at|date:"d M Y H:i" }}</p>
-                <p>{{ recipe.description|default:"No description" }}</p>
-            </article>
-        </div>
-    {% empty %}
-        <p>No recipes yet.</p>
-    {% endfor %}
+    <div class="row">
+        {% for recipe in recipes %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none text-dark">
+                                {{ recipe.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small">
+                            <i class="bi bi-person"></i> {{ recipe.author.username }}
+                            <span class="mx-1">•</span>
+                            <i class="bi bi-clock"></i> {{ recipe.created_at|date:"d M Y" }}
+                        </p>
+                        <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary">View Recipe</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No recipes yet. <a href="{% url 'recipe_create' %}">Create one!</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

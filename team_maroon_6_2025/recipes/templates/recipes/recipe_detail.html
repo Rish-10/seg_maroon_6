@@ -1,0 +1,94 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'recipe_list' %}">Recipes</a></li>
+            <li class="breadcrumb-item active">{{ recipe.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ recipe.title }}</h1>
+
+                    <div class="d-flex align-items-center text-muted mb-3">
+                        <div class="me-3">
+                            <i class="bi bi-person-circle"></i>
+                            <span>{{ recipe.author.username }}</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-clock"></i>
+                            <span>{{ recipe.created_at|date:"d M Y" }}</span>
+                        </div>
+                    </div>
+
+                    {% if recipe.description %}
+                        <div class="alert alert-light border-start border-primary border-4 mb-4">
+                            <p class="mb-0">{{ recipe.description }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <h3 class="h4 mb-3">
+                            <i class="bi bi-basket2"></i> Ingredients
+                        </h3>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <ul class="mb-0">
+                                    {% for ingredient in recipe.ingredients.splitlines %}
+                                        {% if ingredient.strip %}
+                                            <li>{{ ingredient }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="h4 mb-3">
+                            <i class="bi bi-list-ol"></i> Instructions
+                        </h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p style="white-space: pre-line;" class="mb-0">{{ recipe.instructions }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'recipe_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Recipes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Recipe Info</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Created:</strong><br>
+                        {{ recipe.created_at|date:"F d, Y" }}
+                    </p>
+                    <p class="mb-2">
+                        <strong>Last Updated:</strong><br>
+                        {{ recipe.updated_at|date:"F d, Y" }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Author:</strong><br>
+                        {{ recipe.author.username }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
