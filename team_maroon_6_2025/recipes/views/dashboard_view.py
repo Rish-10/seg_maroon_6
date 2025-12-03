@@ -1,29 +1,32 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.db.models import Q 
 from recipes.models import Recipe
-
 
 @login_required
 def dashboard(request):
-    """
-    Display the current user's dashboard.
-
-    This view renders the dashboard page for the authenticated user.
-    It ensures that only logged-in users can access the page. If a user
-    is not authenticated, they are automatically redirected to the login
-    page.
-    """
-
     current_user = request.user
-    recipes = (
-        Recipe.objects.select_related("author")
-        .order_by("-created_at")
-    )
+    
+    query = request.GET.get('q', '')               
+    category_filter = request.GET.get('category', '') 
+
+    recipes = Recipe.objects.select_related("author").order_by("-created_at")
+
+    if query:
+        recipes = recipes.filter(
+            Q(title__icontains=query) | Q(ingredients__icontains=query)
+        )
+
+    if category_filter and category_filter != 'All':
+        recipes = recipes.filter(category=category_filter)
+
     return render(
         request,
         'dashboard.html',
         {
             'user': current_user,
             'recipes': recipes,
+            'query': query, 
+            'selected_category': category_filter,
         },
     )
