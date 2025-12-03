@@ -17,6 +17,20 @@ class Recipe(models.Model):
 
     def __str__(self): 
         return self.title
+    # Define the choices for the category dropdown
+    CATEGORY_CHOICES = [
+        ('Breakfast', 'Breakfast'),
+        ('Lunch', 'Lunch'),
+        ('Dinner', 'Dinner'),
+        ('Dessert', 'Dessert'),
+    ]
+
+    # Add the category field to the database
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default='Dinner'  
+    )
 
     @property
     def likes_count(self):

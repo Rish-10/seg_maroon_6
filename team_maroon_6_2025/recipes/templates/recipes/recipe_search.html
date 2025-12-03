@@ -1,46 +1,68 @@
 {% extends 'base_content.html' %}
+
 {% block content %}
 <div class="container mt-4">
-    <!-- Search Bar -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Search Results</h1>
-        <form action="{% url 'recipe_search' %}" method="GET" class="d-flex max-4" style="max-width: 600px;">
+        
+        <form action="{% url 'recipe_search' %}" method="GET" class="d-flex" style="max-width: 800px;">
+            
             <input
                 type="text"
                 name="q"
+                value="{{ query }}"
                 class="form-control form-control-sm me-2"
                 placeholder="Search recipes..."
-                requires
             >
+            
+            <select name="category" class="form-select form-select-sm me-2" style="width: auto; min-width: 140px;">
+                <option value="All">All Categories</option>
+                <option value="Breakfast" {% if selected_category == 'Breakfast' %}selected{% endif %}>Breakfast</option>
+                <option value="Lunch" {% if selected_category == 'Lunch' %}selected{% endif %}>Lunch</option>
+                <option value="Dinner" {% if selected_category == 'Dinner' %}selected{% endif %}>Dinner</option>
+                <option value="Dessert" {% if selected_category == 'Dessert' %}selected{% endif %}>Dessert</option>
+            </select>
           
-            <button type="submit" class="btn btn-sm btn-outline-primary">
+            <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap">
                 <i class="bi bi-search"></i> Search
             </button>
         </form>
 
-        <a href="{% url 'recipe_create' %}" class="btn btn-primary">Create Recipe</a>
+        <a href="{% url 'recipe_create' %}" class="btn btn-primary ms-2">Create Recipe</a>
     </div>
 
-    <!-- Display what was searched -->
     {% if has_searched %}
         <p class="text-muted mb-4">
-            Showing results for: <strong>"{{ query }}"</strong>
+            Showing results for: 
+            {% if query %}
+                <strong>"{{ query }}"</strong>
+            {% else %}
+                <strong>Any text</strong>
+            {% endif %}
+
+            {% if selected_category and selected_category != 'All' %}
+                in Category: <strong>{{ selected_category }}</strong>
+            {% endif %}
         </p>
     {% endif %}
 
-    
     {% if recipes %}
-        
         <div class="row">
             {% for recipe in recipes %}
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none text-dark">
-                                    {{ recipe.title }}
-                                </a>
-                            </h5>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">
+                                    <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none text-dark">
+                                        {{ recipe.title }}
+                                    </a>
+                                </h5>
+                                {% if recipe.category %}
+                                    <span class="badge bg-secondary" style="font-size: 0.75em;">{{ recipe.category }}</span>
+                                {% endif %}
+                            </div>
+
                             <p class="card-text text-muted small">
                                 <i class="bi bi-person"></i> {{ recipe.author.username }}
                                 <span class="mx-1">•</span>
@@ -57,27 +79,29 @@
         </div>
     {% else %}
         {% if has_searched %}
-            <!-- No recipes found -->
             <div class="alert alert-warning text-center mt-5">
                 <h4 class="alert-heading">
                     <i class="bi bi-search"></i> No recipes found
                 </h4>
-                <p class="mb-3">We couldn't find any recipes matching "<strong>{{ query }}</strong>".</p>
+                <p class="mb-3">
+                    We couldn't find any recipes matching 
+                    <strong>"{{ query }}"</strong>
+                    {% if selected_category and selected_category != 'All' %}
+                        in <strong>{{ selected_category }}</strong>
+                    {% endif %}.
+                </p>
                 <hr>
                 <p class="mb-0">
-                    Try a different search term or 
-                    <a href="{% url 'recipe_list' %}" class="alert-link">browse all recipes</a>.
+                    Try a different search term, change the category, or 
+                    <a href="{% url 'recipe_search' %}" class="alert-link">clear all filters</a>.
                 </p>
             </div>
         {% else %}
-            
             <div class="alert alert-info text-center mt-5">
                 <h4 class="alert-heading">
                     <i class="bi bi-lightbulb"></i> Start searching
                 </h4>
-                <p class="mb-0">Enter a search term above to find recipes.</p>
+                <p class="mb-0">Enter a search term or select a category above to find recipes.</p>
             </div>
-        {% endif %}
-    {% endif %}
-</div>
+        {% endif %} {% endif %} </div>
 {% endblock %}
