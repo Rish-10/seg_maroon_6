@@ -44,3 +44,8 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         """
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["favourites"] = self.request.user.favourites.select_related("author").order_by("-created_at")
+        return context

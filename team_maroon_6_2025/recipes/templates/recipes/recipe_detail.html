@@ -14,6 +14,58 @@
                 <div class="card-body">
                     <h1 class="card-title mb-3">{{ recipe.title }}</h1>
 
+                    <form class="d-inline" method="post" action="{% url 'recipe_favourite_toggle' recipe.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        {% if user.is_authenticated and recipe in user.favourites.all %}
+                            <button class="btn btn-sm btn-outline-danger mb-3" type="submit">Remove from favourites</button>
+                        {% else %}
+                            <button class="btn btn-sm btn-outline-primary mb-3" type="submit">Add to favourites</button>
+                        {% endif %}
+                    </form>
+
+                    <form class="d-inline ms-2" method="post" action="{% url 'recipe_like_toggle' recipe.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        {% if user.is_authenticated and user in recipe.likes.all %}
+                            <button class="btn btn-sm btn-outline-success" type="submit">Unlike</button>
+                        {% else %}
+                            <button class="btn btn-sm btn-success" type="submit">Like</button>
+                        {% endif %}
+                    </form>
+                    <span class="badge bg-light text-dark ms-2 align-middle">Likes: {{ recipe.likes_count }}</span>
+
+
+                    {% if recipe.images.all %}
+                        <div id="recipeImages" class="carousel slide mb-4" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                            {% for img in recipe.images.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ img.image.url }}" style="max-height: 400px; object-fit: cover;" class="d-block w-100 rounded" alt="{{ img.caption|default:'Recipe image' }}">
+                                {% if img.caption %}
+                                    <div class="carousel-caption d-none d-md-block">
+                                        <small>{{ img.caption }}</small>
+                                    </div>
+                                {% endif %}
+                                </div>
+                            {% endfor %}
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#recipeImages" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#recipeImages" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    {% endif %}
+
+
+
+
+
+
                     <div class="d-flex align-items-center text-muted mb-3">
                         <div class="me-3">
                             <i class="bi bi-person-circle"></i>
@@ -58,6 +110,58 @@
                             </div>
                         </div>
                     </div>
+
+                    <section class="mt-4">
+                        <h3>Comments ({{ comments|length }})</h3>
+                        {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'comment_add' recipe.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                {{ comment_form.body }}
+                                <button class="btn btn-primary btn-sm mt-2" type="submit">Post comment</button>
+                            </form>
+                        {% else %}
+                            <p><a href="{% url 'log_in' %}">Log in</a> to comment.</p>
+                        {% endif %}
+
+                        {% for comment in comments %}
+                            <div class="mt-3 border rounded p-3">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comment.author.username }}</strong>
+                                <small>{{ comment.created_at|date:"d M Y H:i" }}</small>
+                            </div>
+                            <p class="mb-2">{{ comment.body }}</p>
+
+                            <form method="post" action="{% url 'comment_like_toggle' comment.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                {% if user.is_authenticated and user in comment.likes.all %}
+                                    <button class="btn btn-sm btn-outline-success" type="submit">Unlike</button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-success" type="submit">Like</button>
+                                {% endif %}
+                            </form>
+                            <span class="badge bg-light text-dark ms-2 align-middle">Likes: {{ comment.likes_count }}</span>
+
+                            {% if comment.author == user %}
+                                <details class="mt-2">
+                                    <summary class="text-primary">Edit</summary>
+                                    <form method="post" action="{% url 'comment_edit' comment.id %}" class="mt-2">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <textarea name="body" class="form-control" rows="3">{{ comment.body }}</textarea>
+                                        <button class="btn btn-primary btn-sm mt-2" type="submit">Save changes</button>
+                                    </form>
+                                </details>
+                            {% endif %}
+
+
+                            </div>
+                            {% empty %}
+                                <p class="text-muted">No comments yet. Be the first!</p>
+                        {% endfor %}
+                    </section>
+
 
                     <div class="d-flex gap-2">
                         <a href="{% url 'recipe_list' %}" class="btn btn-outline-secondary">

@@ -12,15 +12,47 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
 
                         {% for field in form %}
-                        <div class="mb-3">
-                             <label class="form-label fw-bold text-secondary">{{ field.label }}</label>
-                            {{ field }}
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-secondary">{{ field.label }}</label>
+                                {{ field }}
+                            </div>
                         {% endfor %}
+
+                        <h3 class="fs-5 mt-4">Images</h3>
+                        {{ formset.management_form }}
+                        {% for image_form in formset %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                {{ image_form.id }}
+                                <div class="mb-3">
+                                    {{ image_form.image.label_tag }}
+                                    {{ image_form.image }}
+                                    {% if image_form.image.errors %}
+                                    <div class="text-danger">{{ image_form.image.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    {{ image_form.caption.label_tag }}
+                                    {{ image_form.caption }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ image_form.position.label_tag }}
+                                    {{ image_form.position }}
+                                </div>
+                                {% if image_form.DELETE %}
+                                    <div class="form-check">
+                                    {{ image_form.DELETE }}
+                                    {{ image_form.DELETE.label_tag }}
+                                    </div>
+                                {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
 
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg shadow-sm">

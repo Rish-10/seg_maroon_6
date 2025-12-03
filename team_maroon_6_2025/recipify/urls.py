@@ -19,6 +19,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from recipes import views
+from recipes.views import favourite_views
+from recipes.views import like_views
+from recipes.views import comment_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,5 +36,12 @@ urlpatterns = [
     path('recipes/create/', views.recipe_create, name='recipe_create'),
     path('recipes/search/', views.recipe_search, name='recipe_search'),
     path('recipes/<int:pk>', views.recipe_detail, name='recipe_detail'),
+    path('recipes/<int:pk>/favourite/', favourite_views.toggle_favourite, name='recipe_favourite_toggle'),
+    path("recipes/<int:pk>/like/", like_views.toggle_like, name="recipe_like_toggle"),
+    path("recipes/<int:pk>/comments/add/", comment_views.add_comment, name="comment_add"),
+    path("comments/<int:comment_id>/edit/", comment_views.edit_comment, name="comment_edit"),
+    path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

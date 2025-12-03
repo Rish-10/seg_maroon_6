@@ -17,6 +17,7 @@ def dashboard(request):
     current_user = request.user
     recipes = (
         Recipe.objects.select_related("author")
+        .prefetch_related("comments__author")
         .order_by("-created_at")
     )
     return render(
