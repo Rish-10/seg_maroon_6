@@ -34,7 +34,13 @@ urlpatterns = [
     path('log_out/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
-    path('profile/<str:username>', views.view_profile_page, name='profile_page'),
+    path('profile/<str:username>/', views.profile_page, kwargs={'section': 'posted_recipes'}, name='profile_page'),
+
+    # 2. Liked Section
+    path('profile/<str:username>/likes/', views.profile_page, kwargs={'section': 'liked_recipes'}, name='profile_likes'),
+
+    # 3. Favourites Section
+    path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
     path('follow/<str:username>/', views.follow_toggle, name='follow_toggle'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('recipes/', views.recipe_list, name='recipe_list'),

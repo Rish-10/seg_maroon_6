@@ -7,18 +7,8 @@ from django.urls import reverse
 from recipes.models import User
 
 
-def view_profile_page(request, username):
+def profile_page(request, username, section='posted_recipes'):
     profile_user = get_object_or_404(User, username=username)
-    user_recipes = user_recipes = (
-        profile_user.recipes
-        .prefetch_related(
-            'images',
-            'likes',
-            'comments',
-            'comments__author'
-        )
-        .order_by('-created_at')
-    )
 
     # Check if the logged-in user follows this profile
     is_following = False
@@ -26,10 +16,25 @@ def view_profile_page(request, username):
         # Check if profile_user exists in the logged-in user's 'following' list
         is_following = request.user.following.filter(id=profile_user.id).exists()
 
+    base_prefetch = ['images', 'likes', 'comments', 'comments__author']
+
+    can_view_interests = is_following or request.user == profile_user
+
+    if not can_view_interests:
+        section = 'posted_recipes'
+
+    if section == 'favourite_recipes':
+        user_recipes = profile_user.favourites.prefetch_related(*base_prefetch).order_by('-created_at')
+    elif section == 'liked_recipes':
+        user_recipes = profile_user.liked_recipes.prefetch_related(*base_prefetch).order_by('-created_at')
+    else:
+        user_recipes = profile_user.recipes.prefetch_related(*base_prefetch).order_by('-created_at')
+
     context = {
         'profile_user': profile_user,
         'user_recipes': user_recipes,
         'is_following': is_following,
+        'current_section': section,
     }
     return render(request, "users/profile_page.html", context)
 
