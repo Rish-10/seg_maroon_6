@@ -47,7 +47,7 @@
                       </a>
                     </h5>
                     <p class="mb-1">{{ recipe.description|default:"No description yet." }}</p>
-                    <small>by {{ recipe.author.username }}</small>
+                      <small>by <a href="{% url 'profile_page' recipe.author.username %}">{{ recipe.author.username }}</a></small>
                   </div>
                   <div class="text-end">
                     <small class="d-block">{{ recipe.created_at|date:"d M Y H:i" }}</small>
@@ -83,17 +83,14 @@
                         <p class="text-muted mb-0">No comments yet.</p>
                       {% endfor %}
                       {% if recipe.comments.count > 3 %}
-                        <a href="{% url 'recipe_detail' recipe.pk %}">View all comments</a>
+                          <a href="{% url 'recipe_detail' recipe.pk %}">View all comments</a>
                       {% endif %}
                     </div>
-
-
                   </div>
                 </div>
               </div>
             </div>
           {% endfor %}
-
         </div>
       {% else %}
         <p class="text-muted">No recipes yet. Be the first to <a href="{% url 'recipe_create' %}">create one</a>.</p>

@@ -18,6 +18,13 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     favourites = models.ManyToManyField('recipes.Recipe', related_name='favourited_by', blank=True)
+    bio = models.TextField(blank=True, max_length=500)
+    following = models.ManyToManyField(
+        'self',
+        related_name='followers',
+        symmetrical=False,
+        blank=True
+    )
 
 
     class Meta:
@@ -41,3 +48,11 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         
         return self.gravatar(size=60)
+
+    @property
+    def follower_count(self):
+        return self.followers.count()
+
+    @property
+    def following_count(self):
+        return self.following.count()
