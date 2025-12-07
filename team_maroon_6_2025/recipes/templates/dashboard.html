@@ -71,6 +71,13 @@
                       {% endif %}
                     </form>
                     <span class="badge bg-light text-dark mt-2 d-inline-block">Likes: {{ recipe.likes_count }}</span>
+                    
+                    {% if user.is_authenticated and recipe.author == user %}
+                        <a href="{% url 'recipe_edit' recipe.pk %}"
+                            class="btn btn-sn btn-outline-secondary ms-2">
+                            Edit recipe
+                        </a>
+                    {% endif %}
 
 
                     <div class="mt-3">

@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.forms import inlineformset_factory
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from recipes.models import Recipe 
 from recipes.forms import RecipeForm 
 from recipes.forms import CommentForm
@@ -40,4 +42,40 @@ def recipe_create(request):
     else:
         form = RecipeForm()
         formset = RecipeImageFormSet()
-    return render(request, "recipes/recipe_form.html", {"form": form, "formset": formset})
+    return render(request,
+                   "recipes/recipe_form.html",
+                    {
+                        "form": form,
+                        "formset": formset,
+                        "is_edit": False
+                    },
+    )
+
+@login_required
+def recipe_edit(request, pk):
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    if recipe.author != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this recipe.")
+    
+    if request.method == "POST":
+        form = RecipeForm(request.POST, instance=recipe)
+        formset = RecipeImageFormSet(request.POST, request.FILES, instance=recipe)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            return redirect("recipe_detail", pk=recipe.pk)
+    else:
+        form = RecipeForm(instance=recipe)
+        formset = RecipeImageFormSet(instance=recipe)
+
+    return render(
+        request,
+        "recipes/recipe_form.html",
+        {
+            "form": form,
+            "formset": formset,
+            "recipe": recipe,
+            "is_edit": True,
+        },
+    )

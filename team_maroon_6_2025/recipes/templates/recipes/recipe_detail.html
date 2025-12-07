@@ -35,7 +35,13 @@
                     </form>
                     <span class="badge bg-light text-dark ms-2 align-middle">Likes: {{ recipe.likes_count }}</span>
 
-
+                    {% if user.is_authenticated and recipe.author == user %}
+                        <a href="{% url 'recipe_edit' recipe.pk %}"
+                            class="btn btn-sn btn-outline-secondary ms-2">
+                            Edit recipe
+                        </a>
+                    {% endif %}
+                        
                     {% if recipe.images.all %}
                         <div id="recipeImages" class="carousel slide mb-4" data-bs-ride="carousel">
                             <div class="carousel-inner">
