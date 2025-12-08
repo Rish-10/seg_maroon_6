@@ -1,10 +1,10 @@
 from django import forms
-from recipes.models.recipe import Recipe
+from recipes.models.recipe import Recipe, Category
 
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ['title', 'description', 'ingredients', 'instructions']
+        fields = ['title', 'description', 'ingredients', 'instructions', 'categories']
         
         # Add Bootstrap styles and English placeholders
         widgets = {
@@ -27,4 +27,10 @@ class RecipeForm(forms.ModelForm):
                 'rows': 6,
                 'placeholder': 'Step 1: ...\nStep 2: ...'
             }),
+            'categories': forms.CheckboxSelectMultiple()
         }
+
+    def __init__(self, *args, **kwargs): 
+        super().__init__(*args, **kwargs)
+        self.fields['categories'].queryset = Category.objects.order_by('label')
+        self.fields['categories'].required = False 

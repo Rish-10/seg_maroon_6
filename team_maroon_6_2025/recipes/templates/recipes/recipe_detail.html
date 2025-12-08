@@ -14,6 +14,42 @@
                 <div class="card-body">
                     <h1 class="card-title mb-3">{{ recipe.title }}</h1>
 
+                    <div class="mb-3">
+                        {% for star in star_range %}
+                            {% if average_rating|default:0 >= star %}
+                                <i class="bi bi-star-fill text-warning fs-4"></i>
+                            {% else %}
+                                <i class="bi bi-star text-warning fs-4"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <small class="ms-2 text-muted">
+                            {{ average_rating|floatformat:1 }} ({{ rating_count }} ratings)
+                        </small>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                      <form method="post" action="{% url 'recipe_rate' recipe.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <div class="d-inline-flex gap-1 mb-3">
+                          {% for star in star_range %}
+                            <button type="submit" name="rating" value="{{ star }}" class="btn btn-link p-0 border-0">
+                              {% if user_rating and user_rating.rating >= star %}
+                                <i class="bi bi-star-fill text-primary fs-5"></i>
+                              {% else %}
+                                <i class="bi bi-star text-primary fs-5"></i>
+                              {% endif %}
+                            </button>
+                          {% endfor %}
+                        </div>
+                      </form>
+                    {% else %}
+                      <small class="text-muted">Log in to rate.</small>
+                    {% endif %}
+
+
+
+
                     <form class="d-inline" method="post" action="{% url 'recipe_favourite_toggle' recipe.pk %}">
                         {% csrf_token %}
                         <input type="hidden" name="next" value="{{ request.path }}">
@@ -188,14 +224,28 @@
                         <strong>Created:</strong><br>
                         {{ recipe.created_at|date:"F d, Y" }}
                     </p>
+
                     <p class="mb-2">
                         <strong>Last Updated:</strong><br>
                         {{ recipe.updated_at|date:"F d, Y" }}
                     </p>
+
                     <p class="mb-0">
                         <strong>Author:</strong><br>
                         {{ recipe.author.username }}
                     </p>
+
+                    <p class="mt-3 mb-0">
+                        <strong>Categories:</strong><br>
+                        {% if recipe.categories.exists %}
+                            {% for category in recipe.categories.all %}
+                                <span class="badge bg-secondary me-1">{{ category.label }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">No category selected</span>
+                        {% endif %}
+                    </p>
+
                 </div>
             </div>
         </div>
