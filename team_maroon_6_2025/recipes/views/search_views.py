@@ -1,35 +1,45 @@
 from django.shortcuts import render
-from django.db.models import Q  # Import Q to allow complex queries (OR logic)
-from recipes.models import Recipe
+from django.db.models import Q
+from recipes.models import Recipe, Category
 
 def recipe_search(request):
     """
     View function to handle recipe search and category filtering.
     """
-    # 1. Get query parameters from the URL
-    query = request.GET.get('q', '').strip()           # The search text
-    category_filter = request.GET.get('category', '')  # The selected category
+    query = request.GET.get('q', '').strip()
+    include_ids = [int(pk) for pk in request.GET.getlist('include') if pk.isdigit()]
+    exclude_ids = [int(pk) for pk in request.GET.getlist('exclude') if pk.isdigit()]
 
-    # 2. Start with all recipes (ordered by newest first)
-    recipes = Recipe.objects.select_related("author").all().order_by("-created_at")
+    recipes = (
+        Recipe.objects.select_related("author")
+        .prefetch_related("categories")
+        .order_by("-created_at")
+    )
 
-    # 3. Apply Search Logic (if text is provided)
     if query:
-        # Filter: Title contains query OR Ingredients contain query
         recipes = recipes.filter(
             Q(title__icontains=query) | Q(ingredients__icontains=query)
         ).distinct()
 
-    # 4. Apply Category Filter Logic (if a category is selected)
-    if category_filter and category_filter != 'All':
-        recipes = recipes.filter(categories__label__iexact=category_filter).distinct()
+    if include_ids:
+        # Must contain at least one of the included categories
+        recipes = recipes.filter(categories__id__in=include_ids).distinct()
 
-    # 5. Render the template with results
-    return render(request, 'recipes/recipe_search.html', 
+    if exclude_ids:
+        recipes = recipes.exclude(categories__id__in=exclude_ids).distinct()
+
+    categories = Category.objects.order_by("label")
+    has_searched = bool(query) or bool(include_ids) or bool(exclude_ids)
+
+    return render(
+        request,
+        'recipes/recipe_search.html',
         {
             'recipes': recipes,
             'query': query,
-            'selected_category': category_filter, 
-            'has_searched': bool(query) or (bool(category_filter) and category_filter != 'All'),
+            'categories': categories,
+            'selected_includes': include_ids,
+            'selected_excludes': exclude_ids,
+            'has_searched': has_searched,
         }
     )

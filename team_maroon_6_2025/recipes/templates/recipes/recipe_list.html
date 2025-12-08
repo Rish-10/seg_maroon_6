@@ -31,7 +31,7 @@
                             </a>
                         </h5>
                         <p class="card-text text-muted small">
-                            <i class="bi bi-person"></i> {{ recipe.author.username }}
+                            <i class="bi bi-person"></i> <a href="{% url 'user_detail' recipe.author.username %}" class="text-decoration-none">{{ recipe.author.username }}</a>
                             <span class="mx-1">•</span>
                             <i class="bi bi-clock"></i> {{ recipe.created_at|date:"d M Y" }}
                         </p>

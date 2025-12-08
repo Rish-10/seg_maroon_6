@@ -18,6 +18,12 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     favourites = models.ManyToManyField('recipes.Recipe', related_name='favourited_by', blank=True)
+    following = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        related_name='followers',
+        blank=True,
+    )
 
 
     class Meta:

@@ -16,9 +16,30 @@ from recipes.models import User
 
 
 user_fixtures = [
-    {'username': '@johndoe', 'email': 'john.doe@example.org', 'first_name': 'John', 'last_name': 'Doe'},
-    {'username': '@janedoe', 'email': 'jane.doe@example.org', 'first_name': 'Jane', 'last_name': 'Doe'},
-    {'username': '@charlie', 'email': 'charlie.johnson@example.org', 'first_name': 'Charlie', 'last_name': 'Johnson'},
+    {
+        'username': '@johndoe',
+        'email': 'john.doe@example.org',
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'is_staff': True,
+        'is_superuser': True,
+    },
+    {
+        'username': '@janedoe',
+        'email': 'jane.doe@example.org',
+        'first_name': 'Jane',
+        'last_name': 'Doe',
+        'is_staff': False,
+        'is_superuser': False,
+    },
+    {
+        'username': '@charlie',
+        'email': 'charlie.johnson@example.org',
+        'first_name': 'Charlie',
+        'last_name': 'Johnson',
+        'is_staff': False,
+        'is_superuser': False,
+    },
 ]
 
 
@@ -67,9 +88,36 @@ class Command(BaseCommand):
         self.generate_random_users()
 
     def generate_user_fixtures(self):
-        """Attempt to create each predefined fixture user."""
+        """
+        Upsert fixture users and enforce their roles/password.
+
+        - @johndoe: admin (staff + superuser)
+        - @janedoe, @charlie: regular users
+        """
         for data in user_fixtures:
-            self.try_create_user(data)
+            username = data["username"]
+            defaults = {
+                "email": data["email"],
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "is_staff": data.get("is_staff", False),
+                "is_superuser": data.get("is_superuser", False),
+            }
+            user, created = User.objects.get_or_create(username=username, defaults=defaults)
+            changed = created
+
+            # Ensure fields and password are up to date for idempotency
+            for field, value in defaults.items():
+                if getattr(user, field) != value:
+                    setattr(user, field, value)
+                    changed = True
+
+            if not user.check_password(Command.DEFAULT_PASSWORD):
+                user.set_password(Command.DEFAULT_PASSWORD)
+                changed = True
+
+            if changed:
+                user.save()
 
     def generate_random_users(self):
         """

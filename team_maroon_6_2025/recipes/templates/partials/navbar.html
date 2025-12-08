@@ -12,25 +12,39 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}" href="{% url 'recipe_list' %}">All recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_search' %}active{% endif %}" href="{% url 'recipe_search' %}">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_create' %}active{% endif %}" href="{% url 'recipe_create' %}">Create</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'user_detail' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" href="{% url 'user_detail' user.username %}">My page</a>
+          </li>
+        {% endif %}
+      </ul>
+
       {% if user.is_authenticated %}
-        {# Existing menu for logged-in users #}
         {% include 'partials/menu.html' %}
       {% else %}
-        <ul class="navbar-nav mb-2 mb-lg-0">
-          {# On the log-in page, show a link to Sign up #}
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           {% if request.resolver_match.url_name == 'log_in' %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'sign_up' %}">Sign up</a>
             </li>
-
-          {# On the sign-up page, show a link to Log in #}
           {% elif request.resolver_match.url_name == 'sign_up' %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'log_in' %}">Log in</a>
             </li>
-
-          {# (Optional) on other anonymous pages, show both links #}
           {% else %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'log_in' %}">Log in</a>

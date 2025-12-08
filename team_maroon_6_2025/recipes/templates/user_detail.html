@@ -1,0 +1,94 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm mb-4">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <h2 class="mb-1">{{ profile_user.username }}</h2>
+        <p class="mb-2 text-muted">
+          {{ profile_user.first_name }} {{ profile_user.last_name }}
+          {% if profile_user.email %} · {{ profile_user.email }}{% endif %}
+        </p>
+        <div class="d-flex gap-3">
+          <span class="badge bg-primary">Followers: {{ followers_count }}</span>
+          <span class="badge bg-secondary">Following: {{ following_count }}</span>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 align-items-center">
+        {% if not is_self %}
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'user_follow_toggle' profile_user.username %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              {% if is_following %}
+                <button type="submit" class="btn btn-outline-secondary">Unfollow</button>
+              {% else %}
+                <button type="submit" class="btn btn-primary">Follow</button>
+              {% endif %}
+            </form>
+          {% else %}
+            <a href="{% url 'log_in' %}?next={{ request.path }}" class="btn btn-primary">Follow</a>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'profile' %}" class="btn btn-outline-secondary">Edit my profile</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title d-flex justify-content-between align-items-center">
+            Favourite Recipes
+            <span class="badge bg-light text-dark">{{ favourites|length }}</span>
+          </h4>
+          {% if favourites %}
+            <ul class="list-group list-group-flush">
+              {% for recipe in favourites %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none">{{ recipe.title }}</a>
+                    <div class="small text-muted">by <a href="{% url 'user_detail' recipe.author.username %}">{{ recipe.author.username }}</a></div>
+                  </div>
+                  <span class="badge bg-secondary">{{ recipe.created_at|date:"d M Y" }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0">No favourites yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title d-flex justify-content-between align-items-center">
+            Liked Recipes
+            <span class="badge bg-light text-dark">{{ liked_recipes|length }}</span>
+          </h4>
+          {% if liked_recipes %}
+            <ul class="list-group list-group-flush">
+              {% for recipe in liked_recipes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none">{{ recipe.title }}</a>
+                    <div class="small text-muted">by <a href="{% url 'user_detail' recipe.author.username %}">{{ recipe.author.username }}</a></div>
+                  </div>
+                  <span class="badge bg-secondary">{{ recipe.created_at|date:"d M Y" }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0">No likes yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
