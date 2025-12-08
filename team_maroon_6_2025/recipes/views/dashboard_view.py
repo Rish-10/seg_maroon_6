@@ -13,6 +13,8 @@ def dashboard(request):
     is not authenticated, they are automatically redirected to the login
     page.
     """
+    query = request.GET.get("q", "")
+    selected_category = request.GET.get("category", "")
 
     current_user = request.user
     recipes = list(
@@ -44,6 +46,9 @@ def dashboard(request):
         {
             'user': current_user,
             'recipes': recipes,
-            'star_range': range(1, 6)
+            'star_range': range(1, 6),
+
+            'query': query,
+            'selected_category': selected_category,
         },
     )

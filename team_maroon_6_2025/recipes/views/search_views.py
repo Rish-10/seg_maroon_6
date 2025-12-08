@@ -22,7 +22,7 @@ def recipe_search(request):
 
     # 4. Apply Category Filter Logic (if a category is selected)
     if category_filter and category_filter != 'All':
-        recipes = recipes.filter(category=category_filter)
+        recipes = recipes.filter(categories__label__iexact=category_filter).distinct()
 
     # 5. Render the template with results
     return render(request, 'recipes/recipe_search.html', 
