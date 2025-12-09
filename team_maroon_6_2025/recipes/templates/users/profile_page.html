@@ -21,66 +21,74 @@
           {% if is_following %}
             <button type="submit" class="btn btn-secondary">Unfollow</button>
           {% else %}
-            <button type="submit" class="btn btn-primary">Follow</button>
+            {% if follow_request_required %}
+              <button type="submit" class="btn btn-primary">Request to follow</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Follow</button>
+            {% endif %}
           {% endif %}
         </form>
       {% endif %}
     </div>
   </div>
 
-    <hr>
+  <hr>
 
-    <div class="row mt-4">
-      <div class="col-12 mt-3">
+  <div class="row mt-4">
+    <div class="col-12 mt-3">
+      {% if follow_request_required %}
+        <div class="alert alert-light text-center">
+          <p>Only followers can view {{ profile_user.username }}'s recipes.</p>
+        </div>
+      {% else %}
         <ul class="nav nav-tabs mb-3">
           <li class="nav-item">
             <a class="nav-link {% if current_section == 'posted_recipes' %}active{% endif %}"
-               href="{% url 'profile_page' profile_user.username %}">
+              href="{% url 'profile_page' profile_user.username %}">
               Posted
             </a>
           </li>
-
           {% if is_following or request.user == profile_user %}
             <li class="nav-item">
               <a class="nav-link {% if current_section == 'favourite_recipes' %}active{% endif %}"
-                 href="{% url 'profile_favourites' profile_user.username %}">
+                href="{% url 'profile_favourites' profile_user.username %}">
                 Favourites
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if current_section == 'liked_recipes' %}active{% endif %}"
-                 href="{% url 'profile_likes' profile_user.username %}">
-                Likes
+                href="{% url 'profile_likes' profile_user.username %}">
+                  Likes
               </a>
             </li>
           {% endif %}
-          </ul>
-      {% if user_recipes %}
-        {% if current_section == 'posted_recipes' %}
-          {% include "partials/recipe_rows.html" with recipes=user_recipes show_author=False %}
-        {% elif current_section == 'favourite_recipes' %}
-          {% include "partials/recipe_rows.html" with recipes=user_recipes %}
-        {% elif current_section == 'liked_recipes' %}
-          {% include "partials/recipe_rows.html" with recipes=user_recipes %}
-        {% endif %}
-      {% else %}
-        <div class="alert alert-light text-center">
+        </ul>
+        {% if user_recipes %}
           {% if current_section == 'posted_recipes' %}
-            {% if request.user == profile_user %}
-              <p>You haven't posted any recipes yet.</p>
-              <a href="{% url 'recipe_create' %}" class="btn btn-primary btn-sm">Create One Now</a>
-            {% else %}
-              <p>This user hasn't posted any recipes yet.</p>
-            {% endif %}
-
+            {% include "partials/recipe_rows.html" with recipes=user_recipes show_author=False %}
           {% elif current_section == 'favourite_recipes' %}
-            <p>This user hasn't favourited any recipes yet.</p>
+            {% include "partials/recipe_rows.html" with recipes=user_recipes %}
           {% elif current_section == 'liked_recipes' %}
-            <p>This user hasn't liked any recipes yet.</p>
+            {% include "partials/recipe_rows.html" with recipes=user_recipes %}
           {% endif %}
-        </div>
+        {% else %}
+          <div class="alert alert-light text-center">
+            {% if current_section == 'posted_recipes' %}
+              {% if request.user == profile_user %}
+                <p>You haven't posted any recipes yet.</p>
+                <a href="{% url 'recipe_create' %}" class="btn btn-primary btn-sm">Create One Now</a>
+              {% else %}
+                <p>This user hasn't posted any recipes yet.</p>
+              {% endif %}
+            {% elif current_section == 'favourite_recipes' %}
+              <p>This user hasn't favourited any recipes yet.</p>
+            {% elif current_section == 'liked_recipes' %}
+              <p>This user hasn't liked any recipes yet.</p>
+            {% endif %}
+          </div>
+        {% endif %}
       {% endif %}
-        </div>
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -19,12 +19,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, blank=False)
     favourites = models.ManyToManyField('recipes.Recipe', related_name='favourited_by', blank=True)
     bio = models.TextField(blank=True, max_length=500)
-    following = models.ManyToManyField(
-        'self',
-        related_name='followers',
-        symmetrical=False,
-        blank=True
-    )
+    following = models.ManyToManyField('self', related_name='followers', symmetrical=False, blank=True)
+    is_private = models.BooleanField(
+        default=False,
+        help_text="Your recipes will only be visible to followers. Other Recipify users will only be able to follow you once you approve their follow request.")
 
 
     class Meta:

@@ -16,7 +16,11 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
+        fields = ['first_name', 'last_name', 'email', 'bio', 'is_private']
+
+        labels = {
+            'is_private': 'Private profile',
+        }
 
 class NewPasswordMixin(forms.Form):
     """

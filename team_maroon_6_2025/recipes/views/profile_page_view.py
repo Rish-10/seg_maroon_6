@@ -12,9 +12,15 @@ def profile_page(request, username, section='posted_recipes'):
 
     # Check if the logged-in user follows this profile
     is_following = False
+    is_me = False
     if request.user.is_authenticated:
         # Check if profile_user exists in the logged-in user's 'following' list
         is_following = request.user.following.filter(id=profile_user.id).exists()
+        is_me = (request.user == profile_user)
+
+    if profile_user.is_private and not is_me and not is_following:
+        context = {'profile_user': profile_user, 'follow_request_required': True}
+        return render(request, 'users/profile_page.html', context)
 
     base_prefetch = ['images', 'likes', 'comments', 'comments__author']
 
