@@ -19,36 +19,12 @@
 
         <a href="{% url 'recipe_create' %}" class="btn btn-primary">Create Recipe</a>
     </div>
-
-    <div class="row">
-        {% for recipe in recipes %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none text-dark">
-                                {{ recipe.title }}
-                            </a>
-                        </h5>
-                        <p class="card-text text-muted small">
-                            <i class="bi bi-person"></i> <a href="{% url 'user_detail' recipe.author.username %}" class="text-decoration-none">{{ recipe.author.username }}</a>
-                            <span class="mx-1">•</span>
-                            <i class="bi bi-clock"></i> {{ recipe.created_at|date:"d M Y" }}
-                        </p>
-                        <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary">View Recipe</a>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">
-                    No recipes yet. <a href="{% url 'recipe_create' %}">Create one!</a>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+  <div class="col-12 mt-3">
+    {% if recipes %}
+      {% include "partials/recipe_rows.html" with recipes=recipes %}
+    {% else %}
+      <p class="text-muted">No recipes yet. Be the first to <a href="{% url 'recipe_create' %}">create one</a>.</p>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

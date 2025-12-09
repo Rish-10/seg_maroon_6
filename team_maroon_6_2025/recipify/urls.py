@@ -36,7 +36,7 @@ urlpatterns = [
     path('profile/<str:username>/', views.profile_page, kwargs={'section': 'posted_recipes'}, name='profile_page'),
 
     # 2. Liked Section
-    path('profile/<str:username>/liked/', views.profile_page, kwargs={'section': 'liked_recipes'}, name='profile_likes'),
+    path('profile/<str:username>/likes/', views.profile_page, kwargs={'section': 'liked_recipes'}, name='profile_likes'),
 
     # 3. Favourites Section
     path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
@@ -53,7 +53,7 @@ urlpatterns = [
     path("comments/<int:comment_id>/edit/", comment_views.edit_comment, name="comment_edit"),
     path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
     path("recipes/<int:pk>/rate/", views.rate_recipe, name="recipe_rate"),
+
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

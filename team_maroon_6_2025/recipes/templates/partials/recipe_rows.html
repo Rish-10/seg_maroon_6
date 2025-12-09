@@ -20,6 +20,52 @@
               {% if show_author != False %}
                 <small>by <a href="{% url 'profile_page' recipe.author.username %}">{{ recipe.author.username }}</a></small>
               {% endif %}
+            <div class="mb-2">
+              {% for star in star_range %}
+                {% if recipe.rating_avg|default:0 >= star %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% else %}
+                  <i class="bi bi-star text-warning"></i>
+                {% endif %}
+              {% endfor %}
+              <small class="ms-1 text-muted">
+                {{ recipe.rating_avg|default:0|floatformat:1 }} ({{ recipe.rating_total|default:0 }} ratings)
+              </small>
+            </div>
+
+            {% if recipe.categories.exists %}
+              <div class="mb-2">
+                {% for category in recipe.categories.all %}
+                  <span class="badge bg-secondary me-1">{{ category.label }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'recipe_rate' recipe.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <div class="d-inline-flex gap-1">
+                  {% for star in star_range %}
+                    <button
+                        type="submit"
+                        name="rating"
+                        value="{{ star }}"
+                        class="btn btn-link p-0 border-0"
+                        title="Rate {{ star }} star{% if star > 1 %}s{% endif %}"
+                    >
+                      {% if recipe.user_rating_value|default:0 >= star %}
+                        <i class="bi bi-star-fill text-primary fs-5"></i>
+                      {% else %}
+                        <i class="bi bi-star text-primary fs-5"></i>
+                      {% endif %}
+                    </button>
+                  {% endfor %}
+                </div>
+              </form>
+            {% else %}
+              <small class="text-muted">Log in to rate.</small>
+            {% endif %}
           </div>
           <div class="text-end">
             <small class="d-block">{{ recipe.created_at|date:"d M Y H:i" }}</small>
@@ -43,6 +89,13 @@
               {% endif %}
             </form>
             <span class="badge bg-light text-dark mt-2 d-inline-block">Likes: {{ recipe.likes_count }}</span>
+
+            {% if user.is_authenticated and recipe.author == user %}
+              <a href="{% url 'recipe_edit' recipe.pk %}"
+                 class="btn btn-sn btn-outline-secondary ms-2">
+                Edit recipe
+              </a>
+            {% endif %}
 
             <div class="mt-3">
               {% for comment in recipe.comments.all|slice:":3" %}
