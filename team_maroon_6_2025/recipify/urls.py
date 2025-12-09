@@ -23,11 +23,13 @@ from recipes.views import favourite_views
 from recipes.views import like_views
 from recipes.views import comment_views
 from recipes.views import user_views
+from recipes.views import inbox_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('inbox/', inbox_view.inbox, name='inbox'),
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
