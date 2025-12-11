@@ -22,7 +22,6 @@ from recipes import views
 from recipes.views import favourite_views
 from recipes.views import like_views
 from recipes.views import comment_views
-from recipes.views import user_views
 from recipes.views import inbox_view
 
 urlpatterns = [
@@ -34,6 +33,14 @@ urlpatterns = [
     path('log_out/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
+    path('profile/<str:username>/', views.profile_page, kwargs={'section': 'posted_recipes'}, name='profile_page'),
+
+    # 2. Liked Section
+    path('profile/<str:username>/likes/', views.profile_page, kwargs={'section': 'liked_recipes'}, name='profile_likes'),
+
+    # 3. Favourites Section
+    path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
+    path('follow/<str:username>/', views.follow_toggle, name='follow_toggle'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('recipes/', views.recipe_list, name='recipe_list'),
     path('recipes/create/', views.recipe_create, name='recipe_create'),
@@ -46,8 +53,6 @@ urlpatterns = [
     path("comments/<int:comment_id>/edit/", comment_views.edit_comment, name="comment_edit"),
     path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
     path("recipes/<int:pk>/rate/", views.rate_recipe, name="recipe_rate"),
-    path("users/<str:username>/", user_views.user_detail, name="user_detail"),
-    path("users/<str:username>/follow/", user_views.toggle_follow, name="user_follow_toggle"),
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

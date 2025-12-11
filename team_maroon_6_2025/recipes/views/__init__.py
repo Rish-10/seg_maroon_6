@@ -7,4 +7,4 @@ from .recipe_views import *
 from .profile_view import *
 from .sign_up_view import *
 from .search_views import*
-from .user_views import *
+from .profile_page_view import *

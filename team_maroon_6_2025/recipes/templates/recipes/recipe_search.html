@@ -125,7 +125,7 @@
                             </div>
 
                             <p class="card-text text-muted small">
-                                <i class="bi bi-person"></i> <a href="{% url 'user_detail' recipe.author.username %}" class="text-decoration-none">{{ recipe.author.username }}</a>
+                                <i class="bi bi-person"></i> <a href="{% url 'profile_page' recipe.author.username %}" class="text-decoration-none">{{ recipe.author.username }}</a>
                                 <span class="mx-1">•</span>
                                 <i class="bi bi-clock"></i> {{ recipe.created_at|date:"d M Y" }}
                             </p>
@@ -145,7 +145,7 @@
                     <i class="bi bi-search"></i> No recipes found
                 </h4>
                 <p class="mb-3">
-                    We couldn't find any recipes matching 
+                    We couldn't find any recipes matching
                     <strong>"{{ query }}"</strong>
                     {% if selected_category and selected_category != 'All' %}
                         in <strong>{{ selected_category }}</strong>
@@ -153,7 +153,7 @@
                 </p>
                 <hr>
                 <p class="mb-0">
-                    Try a different search term, change the category, or 
+                    Try a different search term, change the category, or
                     <a href="{% url 'recipe_search' %}" class="alert-link">clear all filters</a>.
                 </p>
             </div>

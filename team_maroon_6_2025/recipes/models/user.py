@@ -18,12 +18,11 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     favourites = models.ManyToManyField('recipes.Recipe', related_name='favourited_by', blank=True)
-    following = models.ManyToManyField(
-        'self',
-        symmetrical=False,
-        related_name='followers',
-        blank=True,
-    )
+    bio = models.TextField(blank=True, max_length=500)
+    following = models.ManyToManyField('self', related_name='followers', symmetrical=False, blank=True)
+    is_private = models.BooleanField(
+        default=False,
+        help_text="Your recipes will only be visible to followers. Other Recipify users will only be able to follow you once you approve their follow request.")
 
 
     class Meta:
@@ -47,3 +46,11 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         
         return self.gravatar(size=60)
+
+    @property
+    def follower_count(self):
+        return self.followers.count()
+
+    @property
+    def following_count(self):
+        return self.following.count()

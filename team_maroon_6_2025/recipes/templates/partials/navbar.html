@@ -19,7 +19,7 @@
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}" href="{% url 'recipe_list' %}">All recipes</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}" href="{% url 'recipe_list' %}">All Recipes</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'recipe_search' %}active{% endif %}" href="{% url 'recipe_search' %}">Search</a>
@@ -28,7 +28,7 @@
             <a class="nav-link {% if request.resolver_match.url_name == 'recipe_create' %}active{% endif %}" href="{% url 'recipe_create' %}">Create</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'user_detail' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" href="{% url 'user_detail' user.username %}">My page</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'profile_page' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" href="{% url 'profile_page' user.username %}">My Profile</a>
           </li>
         {% endif %}
       </ul>
