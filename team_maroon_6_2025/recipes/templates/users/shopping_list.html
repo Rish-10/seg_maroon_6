@@ -1,0 +1,53 @@
+<div class="card">
+  <div class="card-body">
+    <h3 class="h5 mb-3">Shopping List</h3>
+
+    <form method="post" action="{% url 'shopping_list_add_item' %}" class="row g-2 mb-4">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <div class="col-md-6">
+        {{ shopping_form.name.errors }}
+        {{ shopping_form.name }}
+      </div>
+      <div class="col-md-4">
+        {{ shopping_form.notes.errors }}
+        {{ shopping_form.notes }}
+      </div>
+      <div class="col-md-2 d-grid">
+        <button class="btn btn-primary" type="submit">Add item</button>
+      </div>
+    </form>
+
+    {% if shopping_list_items %}
+      <ul class="list-group">
+        {% for item in shopping_list_items %}
+          <li class="list-group-item d-flex align-items-center justify-content-between">
+            <form method="post" action="{% url 'shopping_list_toggle_item' item.id %}" class="d-flex align-items-center flex-grow-1 gap-3">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-link text-decoration-none p-0" type="submit">
+                {% if item.is_checked %}
+                  <i class="bi bi-check-square-fill text-success"></i>
+                {% else %}
+                  <i class="bi bi-square text-muted"></i>
+                {% endif %}
+              </button>
+              <span class="{% if item.is_checked %}text-muted text-decoration-line-through{% endif %}">
+                {{ item.name }}{% if item.notes %} <small class="text-muted">({{ item.notes }})</small>{% endif %}
+              </span>
+            </form>
+            <form method="post" action="{% url 'shopping_list_delete_item' item.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-sm btn-outline-danger" type="submit">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted mb-0">Your shopping list is empty.</p>
+    {% endif %}
+  </div>
+</div>

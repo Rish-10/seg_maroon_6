@@ -1,16 +1,86 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Recipes</h1>
-        <a href="{% url 'recipe_create' %}" class="btn btn-primary">Create Recipe</a>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+    <div>
+      <p class="text-uppercase text-muted small mb-1">All recipes</p>
+      <h1 class="mb-0">Discover something new</h1>
     </div>
-  <div class="col-12 mt-3">
-    {% if recipes %}
-      {% include "partials/recipe_rows.html" with recipes=recipes %}
-    {% else %}
-      <p class="text-muted">No recipes yet. Be the first to <a href="{% url 'recipe_create' %}">create one</a>.</p>
-    {% endif %}
+    <a href="{% url 'recipe_create' %}" class="btn btn-primary mt-3 mt-md-0">Create Recipe</a>
+  </div>
+
+  <form method="get" class="card mb-4">
+    <div class="card-body row g-3">
+      <div class="col-12 col-md-5">
+        <label class="form-label text-muted small">Search</label>
+        <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Search by keyword">
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label class="form-label text-muted small">Include categories</label>
+        <div class="d-flex flex-wrap gap-2">
+          {% for category in categories %}
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="include"
+                     value="{{ category.id }}"
+                     id="include-{{ category.id }}"
+                     {% if category.id in selected_includes %}checked{% endif %}>
+              <label class="form-check-label" for="include-{{ category.id }}">{{ category.label }}</label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <label class="form-label text-muted small">Sort by</label>
+        <select name="sort" class="form-select">
+          <option value="newest" {% if active_sort == "newest" %}selected{% endif %}>Newest</option>
+          <option value="likes" {% if active_sort == "likes" %}selected{% endif %}>Most liked</option>
+          <option value="rating" {% if active_sort == "rating" %}selected{% endif %}>Highest rated</option>
+          <option value="comments" {% if active_sort == "comments" %}selected{% endif %}>Most commented</option>
+          <option value="title" {% if active_sort == "title" %}selected{% endif %}>Title A-Z</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-primary">Apply filters</button>
+        <a href="{% url 'recipe_list' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+      </div>
+    </div>
+  </form>
+
+  <ul class="nav nav-pills mb-4" id="feedTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="tab-all" data-bs-toggle="pill"
+              data-bs-target="#feed-all" type="button" role="tab">All Feed
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-following" data-bs-toggle="pill"
+              data-bs-target="#feed-following" type="button" role="tab">
+        Following
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="feed-all" role="tabpanel" aria-labelledby="tab-all">
+      {% if feed_recipes %}
+        {% include "partials/recipe_rows.html" with recipes=feed_recipes %}
+      {% else %}
+        <p class="text-muted">No recipes match those filters yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="feed-following" role="tabpanel" aria-labelledby="tab-following">
+      {% if not user.is_authenticated %}
+        <p class="text-muted">Log in to see recipes from people you follow.</p>
+      {% elif following_recipes %}
+        {% include "partials/recipe_rows.html" with recipes=following_recipes %}
+      {% else %}
+        <p class="text-muted">Follow some cooks to populate this feed.</p>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}

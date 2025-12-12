@@ -61,6 +61,15 @@
                   Likes
               </a>
             </li>
+            {% if request.user == profile_user %}
+              <li class="nav-item">
+                <a class="nav-link {% if current_section == 'shopping_list' %}active{% endif %}"
+                  href="{% url 'profile_shopping_list' profile_user.username %}">
+                  Shopping List
+                </a>
+              </li>
+            {% endif %}
+
           {% endif %}
         </ul>
         {% if user_recipes %}
@@ -87,6 +96,10 @@
             {% endif %}
           </div>
         {% endif %}
+        {% if current_section == 'shopping_list' %}
+          {% include "users/shopping_list.html" %}
+        {% endif %}
+
       {% endif %}
     </div>
   </div>

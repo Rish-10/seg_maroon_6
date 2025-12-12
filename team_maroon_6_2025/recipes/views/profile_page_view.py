@@ -2,7 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 
+from recipes.forms import ShoppingListItemForm
 from recipes.models import User
+
 
 
 def profile_page(request, username, section="posted_recipes"):
@@ -46,6 +48,7 @@ def profile_page(request, username, section="posted_recipes"):
             Q(ingredients__icontains=q)
         )
 
+
     if include_ids:
         user_recipes = user_recipes.filter(categories__id__in=include_ids)
 
@@ -54,12 +57,22 @@ def profile_page(request, username, section="posted_recipes"):
 
     user_recipes = user_recipes.distinct()
 
+    shopping_list_items = None
+    shopping_form = ShoppingListItemForm()
+    if section == "shopping_list" and request.user == profile_user:
+        shopping_list_items = profile_user.shopping_list_items.order_by("is_checked", "name")
+    else:
+        if section == "shopping_list":
+            section = "posted_recipes"
+
     context = {
         "profile_user": profile_user,
         "user_recipes": user_recipes,
         "is_following": is_following,
         "current_section": section,
         "follow_request_required": False,
+        "shopping_list_items": shopping_list_items,
+        "shopping_form": shopping_form
     }
     return render(request, "users/profile_page.html", context)
 

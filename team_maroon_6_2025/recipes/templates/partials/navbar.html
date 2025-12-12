@@ -17,7 +17,7 @@
           {% if user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
-                 href="{% url 'dashboard' %}">Dashboard</a>
+                 href="{% url 'dashboard' %}">Explore</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}"

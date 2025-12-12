@@ -23,6 +23,7 @@ from recipes.views import favourite_views
 from recipes.views import like_views
 from recipes.views import comment_views
 from recipes.views import inbox_view
+from recipes.views import shopping_list_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -52,6 +53,12 @@ urlpatterns = [
     path("comments/<int:comment_id>/edit/", comment_views.edit_comment, name="comment_edit"),
     path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
     path("recipes/<int:pk>/rate/", views.rate_recipe, name="recipe_rate"),
+    path("profile/<str:username>/shopping-list/", views.profile_page,kwargs={"section": "shopping_list"}, name="profile_shopping_list"),
+    path("recipes/<int:pk>/shopping-list/add/", shopping_list_views.shopping_list_add_recipe, name="shopping_list_add_recipe"),
+    path("shopping-list/items/add/", shopping_list_views.shopping_list_add_item, name="shopping_list_add_item"),
+    path("shopping-list/items/<int:item_id>/toggle/", shopping_list_views.shopping_list_toggle_item, name="shopping_list_toggle_item"),
+    path("shopping-list/items/<int:item_id>/delete/", shopping_list_views.shopping_list_delete_item, name="shopping_list_delete_item"),
+
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
