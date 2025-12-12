@@ -4,11 +4,14 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.forms import inlineformset_factory
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.contrib import messages 
-from django.views.decorators.http import require_POST 
-from recipes.models import Recipe, RecipeImage, RecipeRating 
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+from django.urls import reverse
+from django.db import models  # <-- ADD THIS
+
+from recipes.models import Recipe, RecipeImage, RecipeRating
 from recipes.forms import RecipeForm, CommentForm, RecipeImageForm, RecipeRatingForm
-from django.urls import reverse 
+
 
 RecipeImageFormSet = inlineformset_factory(
     Recipe,
@@ -18,38 +21,59 @@ RecipeImageFormSet = inlineformset_factory(
     can_delete=True,
 )
 
-def recipe_list(request): 
+
+def recipe_list(request):
     recipes = Recipe.objects.select_related("author").order_by("-created_at")
+
+    q = (request.GET.get("q") or "").strip()
+    include_ids = [int(x) for x in request.GET.getlist("include") if x.isdigit()]
+    exclude_ids = [int(x) for x in request.GET.getlist("exclude") if x.isdigit()]
+
+    if q:
+        recipes = recipes.filter(
+            models.Q(title__icontains=q)
+            | models.Q(description__icontains=q)
+            | models.Q(ingredients__icontains=q)
+        )
+
+    if include_ids:
+        recipes = recipes.filter(categories__id__in=include_ids).distinct()
+
+    if exclude_ids:
+        recipes = recipes.exclude(categories__id__in=exclude_ids).distinct()
+
     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
+
 
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     comments = recipe.comments.select_related("author")
 
     user_rating = None
-    rating_form = None 
-    if request.user.is_authenticated: 
+    rating_form = None
+    if request.user.is_authenticated:
         user_rating = RecipeRating.objects.filter(
-            recipe = recipe, 
-            user = request.user 
-        ).first() 
+            recipe=recipe,
+            user=request.user
+        ).first()
 
         rating_form = RecipeRatingForm(
-            initial = {"rating": user_rating.rating if user_rating else None}
+            initial={"rating": user_rating.rating if user_rating else None}
         )
 
     context = {
-        "recipe": recipe, 
-        "comments": comments, 
-        "comment_form": CommentForm(), 
-        "rating_form": rating_form, 
-        "user_rating": user_rating, 
-        "average_rating": recipe.average_rating, 
-        "rating_count": recipe.rating_count, 
+        "recipe": recipe,
+        "comments": comments,
+        "comment_form": CommentForm(),
+        "rating_form": rating_form,
+        "user_rating": user_rating,
+        "average_rating": recipe.average_rating,
+        "rating_count": recipe.rating_count,
         "star_range": range(1, 6)
     }
 
     return render(request, "recipes/recipe_detail.html", context)
+
 
 def recipe_create(request):
     if request.method == "POST":
@@ -59,20 +83,24 @@ def recipe_create(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
+            form.save_m2m()
             formset.instance = recipe
             formset.save()
             return redirect("recipe_detail", pk=recipe.pk)
     else:
         form = RecipeForm()
         formset = RecipeImageFormSet()
-    return render(request,
-                   "recipes/recipe_form.html",
-                    {
-                        "form": form,
-                        "formset": formset,
-                        "is_edit": False
-                    },
+
+    return render(
+        request,
+        "recipes/recipe_form.html",
+        {
+            "form": form,
+            "formset": formset,
+            "is_edit": False
+        },
     )
+
 
 @login_required
 def recipe_edit(request, pk):
@@ -80,7 +108,7 @@ def recipe_edit(request, pk):
 
     if recipe.author != request.user:
         return HttpResponseForbidden("You are not allowed to edit this recipe.")
-    
+
     if request.method == "POST":
         form = RecipeForm(request.POST, instance=recipe)
         formset = RecipeImageFormSet(request.POST, request.FILES, instance=recipe)
@@ -104,22 +132,21 @@ def recipe_edit(request, pk):
     )
 
 
-@login_required 
-@require_POST 
-def rate_recipe(request, pk): 
+@login_required
+@require_POST
+def rate_recipe(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     form = RecipeRatingForm(request.POST)
 
     if form.is_valid():
-        rating_value = form.cleaned_data['rating']
+        rating_value = form.cleaned_data["rating"]
         RecipeRating.objects.update_or_create(
-            recipe = recipe,
-            user = request.user,
-            defaults = {'rating': rating_value}
+            recipe=recipe,
+            user=request.user,
+            defaults={"rating": rating_value}
         )
-
         messages.success(request, "Rating saved.")
     else:
         messages.error(request, "Invalid rating.")
 
-    return redirect(request.POST.get("next") or reverse("recipe_detail", args = [recipe.pk]))
+    return redirect(request.POST.get("next") or reverse("recipe_detail", args=[recipe.pk]))

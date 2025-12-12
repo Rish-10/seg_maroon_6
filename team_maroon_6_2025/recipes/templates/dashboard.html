@@ -6,99 +6,26 @@
       <h1>Welcome to your dashboard {{ user.username }}</h1>
     </div>
   </div>
+
   <div class="row mt-4">
     <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-body">
-          <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+          <div class="d-flex flex-wrap justify-content-between align-items-center">
             <h2 class="mb-0">Recipes</h2>
             <a class="btn btn-primary" href="{% url 'recipe_create' %}">Create recipe</a>
           </div>
-
-          <form method="get" class="row g-3 align-items-center">
-            <div class="col-12 col-lg-4">
-              <label class="form-label small text-muted mb-1">Keywords</label>
-              <input
-                type="text"
-                name="q"
-                value="{{ query }}"
-                class="form-control form-control-sm"
-                placeholder="Search title, description, ingredients..."
-              >
-            </div>
-
-            <div class="col-12 col-lg-4">
-              <label class="form-label small text-muted mb-1">Include any of these categories</label>
-              <div class="d-flex flex-wrap gap-2">
-                {% for category in categories %}
-                  <input
-                    type="checkbox"
-                    class="btn-check"
-                    name="include"
-                    value="{{ category.id }}"
-                    id="dash-include-{{ category.id }}"
-                    {% if category.id in selected_includes %}checked{% endif %}
-                  >
-                  <label class="btn btn-outline-primary btn-sm" for="dash-include-{{ category.id }}">
-                    {{ category.label }}
-                  </label>
-                {% endfor %}
-                {% if not categories %}
-                  <span class="text-muted small">No categories yet.</span>
-                {% endif %}
-              </div>
-            </div>
-
-            <div class="col-12 col-lg-4">
-              <label class="form-label small text-muted mb-1">Exclude these categories</label>
-              <div class="d-flex flex-wrap gap-2">
-                {% for category in categories %}
-                  <input
-                    type="checkbox"
-                    class="btn-check"
-                    name="exclude"
-                    value="{{ category.id }}"
-                    id="dash-exclude-{{ category.id }}"
-                    {% if category.id in selected_excludes %}checked{% endif %}
-                  >
-                    <label class="btn btn-outline-secondary btn-sm" for="dash-exclude-{{ category.id }}">
-                      {{ category.label }}
-                    </label>
-                {% endfor %}
-                {% if not categories %}
-                  <span class="text-muted small">No categories yet.</span>
-                {% endif %}
-              </div>
-            </div>
-
-            <div class="col-12 d-flex flex-wrap gap-2 justify-content-between align-items-center">
-              <div class="d-flex align-items-center gap-2">
-                <label for="sort" class="form-label mb-0 small text-muted">Sort by</label>
-                <select id="sort" name="sort" class="form-select form-select-sm">
-                  <option value="newest" {% if active_sort == "newest" %}selected{% endif %}>Newest</option>
-                  <option value="likes" {% if active_sort == "likes" %}selected{% endif %}>Most liked</option>
-                  <option value="rating" {% if active_sort == "rating" %}selected{% endif %}>Top rated</option>
-                  <option value="comments" {% if active_sort == "comments" %}selected{% endif %}>Most commented</option>
-                  <option value="title" {% if active_sort == "title" %}selected{% endif %}>Title A–Z</option>
-                </select>
-              </div>
-
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-sm btn-primary">
-                  <i class="bi bi-search"></i> Apply
-                </button>
-                <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
-              </div>
-            </div>
-          </form>
         </div>
       </div>
     </div>
+
     <div class="col-12 mt-3">
       {% if recipes %}
         {% include "partials/recipe_rows.html" with recipes=recipes %}
       {% else %}
-        <p class="text-muted">No recipes yet. Be the first to <a href="{% url 'recipe_create' %}">create one</a>.</p>
+        <p class="text-muted">
+          No recipes yet. Be the first to <a href="{% url 'recipe_create' %}">create one</a>.
+        </p>
       {% endif %}
     </div>
   </div>

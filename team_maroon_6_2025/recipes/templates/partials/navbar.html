@@ -1,59 +1,139 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'dashboard' %}">
-      Recipify
-    </a>
-    <button class="navbar-toggler" type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#navbarSupportedContent" 
-            aria-controls="navbarSupportedContent" 
-            aria-expanded="false" 
+    <a class="navbar-brand" href="{% url 'dashboard' %}">Recipify</a>
+
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
             aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}" href="{% url 'recipe_list' %}">All Recipes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_search' %}active{% endif %}" href="{% url 'recipe_search' %}">Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_create' %}active{% endif %}" href="{% url 'recipe_create' %}">Create</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'profile_page' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" href="{% url 'profile_page' user.username %}">My Profile</a>
-          </li>
-        {% endif %}
-      </ul>
+    <div class="collapse navbar-collapse flex-column" id="navbarSupportedContent">
+      <div class="d-flex w-100 align-items-center">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                 href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}"
+                 href="{% url 'recipe_list' %}">All Recipes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'recipe_create' %}active{% endif %}"
+                 href="{% url 'recipe_create' %}">Create</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'profile_page' and request.resolver_match.kwargs.username == user.username %}active{% endif %}"
+                 href="{% url 'profile_page' user.username %}">My Profile</a>
+            </li>
 
-      {% if user.is_authenticated %}
-        {% include 'partials/menu.html' %}
-      {% else %}
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          {% if request.resolver_match.url_name == 'log_in' %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'sign_up' %}">Sign up</a>
-            </li>
-          {% elif request.resolver_match.url_name == 'sign_up' %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'log_in' %}">Log in</a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'log_in' %}">Log in</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'sign_up' %}">Sign up</a>
+            <li class="nav-item d-flex align-items-center ms-3 flex-grow-1 flex-md-grow-0">
+              <form id="nav-search-form"
+                    {% with url_name=request.resolver_match.url_name %}
+                      {% if url_name == "dashboard" %}
+                        action="{% url 'dashboard' %}"
+                      {% elif url_name == "profile_page" or url_name == "profile_favourites" or url_name == "profile_likes" %}
+                        action="{{ request.path }}"
+                      {% else %}
+                        action="{% url 'recipe_list' %}"
+                      {% endif %}
+                    {% endwith %}
+                    method="GET"
+                    class="d-flex align-items-center gap-2 flex-wrap flex-md-nowrap">
+
+                <input type="text"
+                       name="q"
+                       value="{{ nav_q }}"
+                       class="form-control form-control-sm w-100 w-md-auto"
+                       placeholder="Search recipes...">
+
+                <button class="btn btn-outline-light btn-sm"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navSearch"
+                        aria-expanded="false"
+                        aria-controls="navSearch"
+                        title="Filters">
+                  <i class="bi bi-funnel"></i>
+                </button>
+
+                <button class="btn btn-primary btn-sm"
+                        type="submit"
+                        title="Search">
+                  <i class="bi bi-search"></i>
+                </button>
+              </form>
             </li>
           {% endif %}
         </ul>
+
+        {% if user.is_authenticated %}
+          {% include 'partials/menu.html' %}
+        {% else %}
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{% url 'log_in' %}">Log in</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'sign_up' %}">Sign up</a></li>
+          </ul>
+        {% endif %}
+      </div>
+
+      {% if user.is_authenticated %}
+        <div class="collapse w-100 mt-3" id="navSearch">
+          <div class="row g-2">
+            <div class="col-12 col-lg-6">
+              <div class="text-light small mb-1">Include any of these</div>
+              <div class="d-flex flex-wrap gap-2">
+                {% for category in nav_categories %}
+                  <input type="checkbox"
+                         class="btn-check"
+                         form="nav-search-form"
+                         name="include"
+                         value="{{ category.id }}"
+                         id="nav-include-{{ category.id }}"
+                         {% if category.id in nav_selected_includes %}checked{% endif %}>
+                  <label class="btn btn-outline-primary btn-sm" for="nav-include-{{ category.id }}">
+                    {{ category.label }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="text-light small mb-1">Exclude these</div>
+              <div class="d-flex flex-wrap gap-2">
+                {% for category in nav_categories %}
+                  <input type="checkbox"
+                         class="btn-check"
+                         form="nav-search-form"
+                         name="exclude"
+                         value="{{ category.id }}"
+                         id="nav-exclude-{{ category.id }}"
+                         {% if category.id in nav_selected_excludes %}checked{% endif %}>
+                  <label class="btn btn-outline-secondary btn-sm" for="nav-exclude-{{ category.id }}">
+                    {{ category.label }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+              {% with url_name=request.resolver_match.url_name %}
+                {% if url_name == "dashboard" %}
+                  <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
+                {% elif url_name == "profile_page" or url_name == "profile_favourites" or url_name == "profile_likes" %}
+                  <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary">Clear</a>
+                {% else %}
+                  <a href="{% url 'recipe_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
+                {% endif %}
+              {% endwith %}
+            </div>
+          </div>
+        </div>
       {% endif %}
     </div>
   </div>

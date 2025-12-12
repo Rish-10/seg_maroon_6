@@ -44,7 +44,6 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('recipes/', views.recipe_list, name='recipe_list'),
     path('recipes/create/', views.recipe_create, name='recipe_create'),
-    path('recipes/search/', views.recipe_search, name='recipe_search'),
     path('recipes/<int:pk>', views.recipe_detail, name='recipe_detail'),
     path('recipes/<int:pk>/favourite/', favourite_views.toggle_favourite, name='recipe_favourite_toggle'),
     path("recipes/<int:pk>/like/", like_views.toggle_like, name="recipe_like_toggle"),
