@@ -35,16 +35,16 @@
       </div>
 
       {% if request.user.is_authenticated and request.user != profile_user %}
-        <form action="{% url 'follow_toggle' profile_user.username %}" method="POST">
+        <form action="{% url 'follow_toggle' profile_user.username %}" method="POST" class="mt-3">
           {% csrf_token %}
           {% if is_following %}
-            <button type="submit" class="btn btn-secondary">Unfollow</button>
+            <button type="submit" class="btn btn-secondary" style="min-width: 140px;">Unfollow</button>
           {% elif request_sent %}
-            <button type="submit" class="btn btn-secondary">Requested</button>
+            <button type="submit" class="btn btn-secondary" style="min-width: 140px;">Requested</button>
           {% elif follow_request_required %}
-            <button type="submit" class="btn btn-primary">Request to follow</button>
+            <button type="submit" class="btn btn-primary" style="min-width: 140px;">Request to follow</button>
           {% else %}
-            <button type="submit" class="btn btn-primary">Follow</button>
+            <button type="submit" class="btn btn-primary" style="min-width: 140px;">Follow</button>
           {% endif %}
         </form>
       {% endif %}
@@ -56,8 +56,8 @@
   <div class="row mt-4">
     <div class="col-12 mt-3">
       {% if follow_request_required %}
-        <div class="alert alert-light text-center">
-          <p>Only followers can view {{ profile_user.username }}'s recipes.</p>
+        <div class="alert alert-light text-center d-flex flex-column justify-content-center" style="min-height: 60px;">
+          <p class="mb-0">Only followers can view {{ profile_user.username }}'s recipes.</p>
         </div>
       {% else %}
         <ul class="nav nav-tabs mb-3">
@@ -100,18 +100,26 @@
             {% include "partials/recipe_rows.html" with recipes=user_recipes %}
           {% endif %}
         {% else %}
-          <div class="alert alert-light text-center">
+          <div class="alert alert-light text-center d-flex flex-column justify-content-center" style="min-height: 60px;">
             {% if current_section == 'posted_recipes' %}
               {% if request.user == profile_user %}
-                <p>You haven't posted any recipes yet.</p>
+                <p class="mb-2">You haven't posted any recipes yet.</p>
                 <a href="{% url 'recipe_create' %}" class="btn btn-primary btn-sm">Create One Now</a>
               {% else %}
-                <p>This user hasn't posted any recipes yet.</p>
+                <p class="mb-0">This user hasn't posted any recipes yet.</p>
               {% endif %}
             {% elif current_section == 'favourite_recipes' %}
-              <p>This user hasn't favourited any recipes yet.</p>
+              {% if request.user == profile_user %}
+                <p class="mb-0">You haven't favourited any recipes yet.</p>
+              {% else %}
+                <p>This user hasn't favourited any recipes yet.</p>
+              {% endif %}
             {% elif current_section == 'liked_recipes' %}
-              <p>This user hasn't liked any recipes yet.</p>
+              {% if request.user == profile_user %}
+                <p class="mb-0">You haven't liked any recipes yet.</p>
+              {% else %}
+                <p class="mb-0">This user hasn't liked any recipes yet.</p>
+              {% endif %}
             {% endif %}
           </div>
         {% endif %}
