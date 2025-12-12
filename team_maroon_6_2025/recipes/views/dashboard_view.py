@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count, Q
 from django.shortcuts import render
 from recipes.models import Recipe, RecipeRating, Category 
+import math 
 
 
 @login_required
@@ -69,18 +70,41 @@ def dashboard(request):
     for recipe in recipes: 
         recipe.user_rating_value = user_ratings.get(recipe.id)
 
+    top_rated_recipes = list(
+        recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:6]
+    )
+    latest_recipes = list(recipes_qs.order_by("-created_at")[:6])
+    featured_recipes = list(recipes_qs.order_by("-likes_total", "-created_at")[:6])
+
+    categories = list(Category.objects.order_by("label"))
+    column_size = max(1, math.ceil(len(categories) / 3))
+    category_columns = [
+        categories[i : i + column_size] for i in range(0, len(categories), column_size)
+    ]
+
 
     return render(
         request,
-        'dashboard.html',
+        "explore.html",
         {
-            'user': current_user,
-            'recipes': recipes,
-            'star_range': range(1, 6),
-            'active_sort': sort,
-            'query': query,
-            'categories': Category.objects.order_by("label"),
-            'selected_includes': include_ids,
-            'selected_excludes': exclude_ids,
+            "user": current_user,
+            "recipes": recipes,
+            "star_range": range(1, 6),
+            "active_sort": sort,
+            "query": query,
+            "categories": categories,
+            "category_columns": category_columns,
+            "selected_includes": include_ids,
+            "selected_excludes": exclude_ids,
+            "top_rated_recipes": top_rated_recipes,
+            "latest_recipes": latest_recipes,
+            "featured_recipes": featured_recipes,
+            "hero_title": "Recipes",
+            "hero_body": (
+                "We've organized these recipes every way we could think of so you "
+                "don't have to! No matter how you browse, you're sure to find just "
+                "what you were looking for."
+            ),
         },
     )
+
