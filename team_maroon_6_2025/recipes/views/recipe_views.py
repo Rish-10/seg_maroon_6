@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.db import models 
 from django.db.models import Avg, Count, Q
+from django.core.paginator import Paginator
 
 from recipes.models import Category, Recipe, RecipeImage, RecipeRating
 from recipes.forms import RecipeForm, CommentForm, RecipeImageForm, RecipeRatingForm
@@ -64,7 +65,9 @@ def recipe_list(request):
     recipes_qs = recipes_qs.distinct()
     ordering = ordering_map.get(sort, ("-created_at",))
 
-    feed_recipes = list(recipes_qs.order_by(*ordering))
+    paginator = Paginator(recipes_qs.order_by(*ordering), 10)
+    page_number = request.GET.get("page") or 1
+    feed_recipes = paginator.get_page(page_number)
     following_recipes = []
 
     if request.user.is_authenticated:
@@ -93,6 +96,9 @@ def recipe_list(request):
         recipe.user_rating_value = user_ratings.get(recipe.id)
 
     categories = Category.objects.order_by("label")
+    query_params = request.GET.copy()
+    query_params.pop("page", None)
+    base_querystring = query_params.urlencode()
 
     return render(
         request,
@@ -106,6 +112,7 @@ def recipe_list(request):
             "query": query,
             "selected_includes": include_ids,
             "selected_excludes": exclude_ids,
+            "base_querystring": base_querystring,
         },
     )
 
