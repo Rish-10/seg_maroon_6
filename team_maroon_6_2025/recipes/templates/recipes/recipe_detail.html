@@ -125,6 +125,17 @@
                         </div>
                     {% endif %}
 
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'shopping_list_add_recipe' recipe.pk %}" class="mb-3">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button class="btn btn-outline-secondary" type="submit">
+                            Add ingredients to shopping list
+                            </button>
+                        </form>
+                    {% endif %}
+
+
                     <div class="mb-4">
                         <h3 class="h4 mb-3">
                             <i class="bi bi-basket2"></i> Ingredients
@@ -134,10 +145,24 @@
                                 <ul class="mb-0">
                                     {% for ingredient in recipe.ingredients.splitlines %}
                                         {% if ingredient.strip %}
-                                            <li>{{ ingredient }}</li>
+                                        <li class="d-flex align-items-center justify-content-between">
+                                            <span>{{ ingredient }}</span>
+                                            {% if user.is_authenticated %}
+                                            <form method="post" action="{% url 'shopping_list_add_item' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{{ request.path }}">
+                                                <input type="hidden" name="name" value="{{ ingredient }}">
+                                                <input type="hidden" name="notes" value="{{ recipe.title }}">
+                                                <button class="btn btn-link btn-sm" type="submit" title="Add to shopping list">
+                                                <i class="bi bi-plus-circle"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </li>
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
+
                             </div>
                         </div>
                     </div>

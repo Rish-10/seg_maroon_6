@@ -23,6 +23,7 @@ from recipes.views import favourite_views
 from recipes.views import like_views
 from recipes.views import comment_views
 from recipes.views import inbox_view
+from recipes.views import shopping_list_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,6 +42,8 @@ urlpatterns = [
     # 3. Favourites Section
     path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
     path('follow/<str:username>/', views.follow_toggle, name='follow_toggle'),
+    path('follow/accept/<str:username>/', views.accept_follow_request, name='accept_request'),
+    path('follow/decline/<str:username>/', views.decline_follow_request, name='decline_request'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('recipes/', views.recipe_list, name='recipe_list'),
     path('recipes/create/', views.recipe_create, name='recipe_create'),
@@ -52,6 +55,12 @@ urlpatterns = [
     path("comments/<int:comment_id>/edit/", comment_views.edit_comment, name="comment_edit"),
     path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
     path("recipes/<int:pk>/rate/", views.rate_recipe, name="recipe_rate"),
+    path("profile/<str:username>/shopping-list/", views.profile_page,kwargs={"section": "shopping_list"}, name="profile_shopping_list"),
+    path("recipes/<int:pk>/shopping-list/add/", shopping_list_views.shopping_list_add_recipe, name="shopping_list_add_recipe"),
+    path("shopping-list/items/add/", shopping_list_views.shopping_list_add_item, name="shopping_list_add_item"),
+    path("shopping-list/items/<int:item_id>/toggle/", shopping_list_views.shopping_list_toggle_item, name="shopping_list_toggle_item"),
+    path("shopping-list/items/<int:item_id>/delete/", shopping_list_views.shopping_list_delete_item, name="shopping_list_delete_item"),
+
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

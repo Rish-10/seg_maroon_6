@@ -4,3 +4,4 @@ from .user_forms import *
 from .comment_form import *
 from .recipe_image_form import *
 from .rating_form import *
+from .shopping_list_form import *
