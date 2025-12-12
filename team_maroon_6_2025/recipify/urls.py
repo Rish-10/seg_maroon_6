@@ -41,6 +41,8 @@ urlpatterns = [
     # 3. Favourites Section
     path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
     path('follow/<str:username>/', views.follow_toggle, name='follow_toggle'),
+    path('follow/accept/<str:username>/', views.accept_follow_request, name='accept_request'),
+    path('follow/decline/<str:username>/', views.decline_follow_request, name='decline_request'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('recipes/', views.recipe_list, name='recipe_list'),
     path('recipes/create/', views.recipe_create, name='recipe_create'),

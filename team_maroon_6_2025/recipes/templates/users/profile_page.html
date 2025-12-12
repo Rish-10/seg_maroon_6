@@ -2,6 +2,25 @@
 {% block content %}
 <div class="container">
   <div class="profile-header">
+    {% if request_received %}
+      <div class="alert alert-info d-flex justify-content-between align-items-center mb-4 shadow-sm">
+        <div>
+          <strong>Request Pending</strong>
+          <span class="d-block small text-muted">
+            {{ profile_user.username }} requested to follow you.
+          </span>
+        </div>
+        <div>
+          <a href="{% url 'accept_request' profile_user.username %}" class="btn btn-sm btn-primary me-1">
+            Accept
+          </a>
+          <a href="{% url 'decline_request' profile_user.username %}" class="btn btn-sm btn-outline-danger">
+            Decline
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
     <div class="profile-info">
       <img src="{{ profile_user.gravatar }}" alt="Avatar" class="avatar">
       <h1>{{ profile_user.full_name }}</h1>
@@ -20,12 +39,12 @@
           {% csrf_token %}
           {% if is_following %}
             <button type="submit" class="btn btn-secondary">Unfollow</button>
+          {% elif request_sent %}
+            <button type="submit" class="btn btn-secondary">Requested</button>
+          {% elif follow_request_required %}
+            <button type="submit" class="btn btn-primary">Request to follow</button>
           {% else %}
-            {% if follow_request_required %}
-              <button type="submit" class="btn btn-primary">Request to follow</button>
-            {% else %}
-              <button type="submit" class="btn btn-primary">Follow</button>
-            {% endif %}
+            <button type="submit" class="btn btn-primary">Follow</button>
           {% endif %}
         </form>
       {% endif %}
