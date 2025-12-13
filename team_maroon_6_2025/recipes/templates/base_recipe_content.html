@@ -1,0 +1,70 @@
+{% extends 'base_content.html' %}
+{% block button_scripts %}
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const favouriteButtons = document.querySelectorAll('.fav-btn');
+
+    function showMessage(message, level) {
+        const container = document.getElementById('message-container');
+
+        if (container) {
+            let alertClass = level;
+            if (level === 'error') alertClass = 'danger';
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${alertClass} alert-dismissible fade show`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            // Add to top of container
+            container.prepend(alertDiv);
+
+            // Optional: Auto-remove after 3 seconds
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+    }
+
+    favouriteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const url = this.dataset.url;
+            const recipeID = this.dataset.recipeId;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const allMatchingButtons = document.querySelectorAll(`.fav-btn[data-recipe-id="${recipeID}"]`);
+
+                allMatchingButtons.forEach(btn => {
+                    if (data.is_favourited) {
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('btn-outline-danger');
+                        btn.textContent = 'Unfavourite';
+                    }
+                    else {
+                        btn.classList.remove('btn-outline-danger');
+                        btn.classList.add('btn-outline-primary');
+                        btn.textContent = 'Favourite';
+                    }
+                });
+
+                if (data.message) {
+                    showMessage(data.message, data.level);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+  });
+  </script>
+{% endblock %}

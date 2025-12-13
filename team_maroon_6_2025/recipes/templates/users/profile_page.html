@@ -1,4 +1,4 @@
-{% extends 'base_content.html' %}
+{% extends "base_recipe_content.html" %}
 {% block content %}
 <div class="container">
   <div class="profile-header">
@@ -126,7 +126,6 @@
         {% if current_section == 'shopping_list' %}
           {% include "users/shopping_list.html" %}
         {% endif %}
-
       {% endif %}
     </div>
   </div>

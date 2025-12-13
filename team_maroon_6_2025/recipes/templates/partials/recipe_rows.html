@@ -69,15 +69,23 @@
           </div>
           <div class="text-end">
             <small class="d-block">{{ recipe.created_at|date:"d M Y H:i" }}</small>
-            <form method="post" action="{% url 'recipe_favourite_toggle' recipe.pk %}" class="mt-2">
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.path }}">
+            <button
+              type="button"
+              class="btn btn-sm fav-btn mt-2
+                {% if user.is_authenticated and recipe in user.favourites.all %}
+                  btn-outline-danger
+                {% else %}
+                  btn-outline-primary
+                {% endif %}"
+              data-url="{% url 'recipe_favourite_toggle' recipe.pk %}"
+              data-recipe-id="{{ recipe.pk }}">
+
               {% if user.is_authenticated and recipe in user.favourites.all %}
-                <button class="btn btn-sm btn-outline-danger" type="submit">Unfavourite</button>
+                Unfavourite
               {% else %}
-                <button class="btn btn-sm btn-outline-primary" type="submit">Favourite</button>
+                Favourite
               {% endif %}
-            </form>
+            </button>
 
             <form method="post" action="{% url 'recipe_like_toggle' recipe.pk %}" class="mt-2">
               {% csrf_token %}
