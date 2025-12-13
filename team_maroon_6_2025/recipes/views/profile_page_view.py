@@ -1,10 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from recipes.forms import ShoppingListItemForm
 from recipes.models import FollowRequest, User
-
+from recipes.search_filters import filter_recipes  # <--- Import the helper
 
 def profile_page(request, username, section="posted_recipes"):
     profile_user = get_object_or_404(User, username=username)
@@ -49,30 +48,20 @@ def profile_page(request, username, section="posted_recipes"):
     if not can_view_interests:
         section = "posted_recipes"
 
+    # 1. Select the Base Queryset depending on the tab
     if section == "favourite_recipes":
         user_recipes = profile_user.favourites.prefetch_related(*base_prefetch).order_by("-created_at")
     elif section == "liked_recipes":
         user_recipes = profile_user.liked_recipes.prefetch_related(*base_prefetch).order_by("-created_at")
     else:
+        # Default to posted recipes
         user_recipes = profile_user.recipes.prefetch_related(*base_prefetch).order_by("-created_at")
 
-    q = (request.GET.get("q") or "").strip()
-    include_ids = [int(x) for x in request.GET.getlist("include") if x.isdigit()]
-    exclude_ids = [int(x) for x in request.GET.getlist("exclude") if x.isdigit()]
+    # 2. APPLY FILTERS (The Fix)
+    # Replaces the old manual q/include/exclude logic
+    user_recipes = filter_recipes(request, user_recipes)
 
-    if q:
-        user_recipes = user_recipes.filter(
-            Q(title__icontains=q)
-            | Q(description__icontains=q)
-            | Q(ingredients__icontains=q)
-        )
-    if include_ids:
-        user_recipes = user_recipes.filter(categories__id__in=include_ids)
-    if exclude_ids:
-        user_recipes = user_recipes.exclude(categories__id__in=exclude_ids)
-
-    user_recipes = user_recipes.distinct()
-
+    # 3. Handle Shopping List (if active)
     shopping_list_items = None
     shopping_form = ShoppingListItemForm()
     if section == "shopping_list":
@@ -157,3 +146,35 @@ def decline_follow_request(request, username):
     )
     follow_request.delete()
     return redirect("profile_page", username=username)
+
+def follow_list(request, username, relation):
+    """
+    Display a list of users who are either followers or being followed by 'username'.
+    """
+    profile_user = get_object_or_404(User, username=username)
+    current_user = request.user
+    
+    is_me = current_user == profile_user
+    is_following = False
+    if current_user.is_authenticated:
+        is_following = current_user.following.filter(id=profile_user.id).exists()
+
+    if profile_user.is_private and not is_me and not is_following:
+        return redirect("profile_page", username=username)
+
+    if relation == "followers":
+        user_list = profile_user.followers.all()
+        title = f"People following {profile_user.username}"
+        empty_message = "No followers yet."
+    else: 
+        user_list = profile_user.following.all()
+        title = f"People {profile_user.username} follows"
+        empty_message = "Not following anyone yet."
+
+    return render(request, 'users/follow_list.html', {
+        'profile_user': profile_user,
+        'user_list': user_list,
+        'title': title,
+        'empty_message': empty_message,
+        'relation': relation
+    })

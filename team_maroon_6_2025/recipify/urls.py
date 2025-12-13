@@ -24,6 +24,7 @@ from recipes.views import like_views
 from recipes.views import comment_views
 from recipes.views import inbox_view
 from recipes.views import shopping_list_views
+from recipes.views import profile_page_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -60,7 +61,8 @@ urlpatterns = [
     path("shopping-list/items/add/", shopping_list_views.shopping_list_add_item, name="shopping_list_add_item"),
     path("shopping-list/items/<int:item_id>/toggle/", shopping_list_views.shopping_list_toggle_item, name="shopping_list_toggle_item"),
     path("shopping-list/items/<int:item_id>/delete/", shopping_list_views.shopping_list_delete_item, name="shopping_list_delete_item"),
-
+    path('profile/<str:username>/', views.profile_page, kwargs={'section': 'posted_recipes'}, name='profile_page'),
+    path('profile/<str:username>/<str:relation>/', profile_page_view.follow_list, name='follow_list'),
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

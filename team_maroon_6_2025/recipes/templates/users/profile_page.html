@@ -28,10 +28,18 @@
 
       <p class="bio">{{ profile_user.bio }}</p>
 
-      <div class="stats">
-        <span><strong>{{ profile_user.recipes.count }}</strong> Recipes</span>
-        <span><strong>{{ profile_user.follower_count }}</strong> Followers</span>
-        <span><strong>{{ profile_user.following_count }}</strong> Following</span>
+      <div class="stats d-flex gap-4">
+        <span>
+          <strong>{{ profile_user.recipes.count }}</strong> Recipes
+        </span>
+  
+        <a href="{% url 'follow_list' profile_user.username 'followers' %}" class="text-decoration-none text-dark">
+          <strong>{{ profile_user.follower_count }}</strong> Followers
+        </a>
+
+        <a href="{% url 'follow_list' profile_user.username 'following' %}" class="text-decoration-none text-dark">
+          <strong>{{ profile_user.following_count }}</strong> Following
+        </a>
       </div>
 
       {% if request.user.is_authenticated and request.user != profile_user %}
