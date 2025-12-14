@@ -62,8 +62,6 @@ def dashboard(request):
     recipes = list(recipes_qs.order_by(*ordering_map.get(sort, ("-created_at",))))
 
     recipe_ids = [recipe.id for recipe in recipes]
-
-    recipe_ids = [recipe.id for recipe in recipes]
     user_ratings = {}
     
     if recipe_ids:
@@ -98,11 +96,8 @@ def dashboard(request):
             "recipes": recipes,
             "star_range": range(1, 6),
             "active_sort": sort,
-            "query": query,
             "categories": categories,
             "category_columns": category_columns,
-            "selected_includes": include_ids,
-            "selected_excludes": exclude_ids,
             "top_rated_recipes": top_rated_recipes,
             "latest_recipes": latest_recipes,
             "featured_recipes": featured_recipes,
