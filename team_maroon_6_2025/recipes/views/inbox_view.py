@@ -1,27 +1,42 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.db import models
-from recipes.models import Recipe, Comment
+from django.shortcuts import render, get_object_or_404, redirect
+from recipes.models.notification import Notification
+from django.views.decorators.http import require_POST
 
 @login_required
 def inbox(request):
-    user = request.user
+    notifications = Notification.objects.filter(
+        recipient=request.user
+    ).select_related('sender', 'content_type')
 
-    comments_on_my_recipes = Comment.objects.filter(
-        recipe__author=user
-    ).exclude(
-        author=user
-    ).select_related('author', 'recipe').order_by('-created_at')[:20]
+    filter_type = request.GET.get('filter', 'all')
 
-    my_recipes_with_likes = Recipe.objects.filter(
-        author=user
-    ).prefetch_related('likes').annotate(
-        like_count=models.Count('likes')
-    ).filter(like_count__gt=0).order_by('-updated_at')[:10]
+    match filter_type:
+        case 'favourite':
+            notifications = notifications.filter(notification_type='favourite')
+        case 'comment':
+            notifications = notifications.filter(notification_type='comment')
+        case 'follow':
+            notifications = notifications.filter(notification_type='follow')
+        case 'request':
+            notifications = notifications.filter(notification_type='request')
 
     context = {
-        'new_comments': comments_on_my_recipes,
-        'liked_recipes': my_recipes_with_likes,
+        'notifications': notifications,
+        'current_filter': filter_type
     }
 
     return render(request, 'inbox.html', context)
+
+@login_required
+@require_POST  # Security: Prevent deletion via simple URL typing
+def delete_notification(request, pk):
+    notification = get_object_or_404(Notification, pk=pk)
+
+    # Security: Ensure only the owner can delete it
+    if notification.recipient == request.user:
+        notification.delete()
+
+    # Redirect back to inbox.
+    # We could theoretically grab the 'filter' param to keep them on the same tab.
+    return redirect('inbox')
