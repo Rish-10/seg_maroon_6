@@ -6,7 +6,6 @@
   border-radius: 0px;
 }
 
-
 /*
  * Cover page
  */
@@ -45,10 +44,10 @@ p.cover-text {
   padding-bottom: 30px;
   border-radius: 15%;
 }
+
 .cover-card-block {
   opacity: 1
 }
-
 
 /*
  * forms
@@ -101,6 +100,15 @@ h3.profile-title {
   font-style: italic;
 }
 
+.profile-bio {
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50ch;
+    word-wrap: break-word;
+}
 
 /*
  * Hyperlinks

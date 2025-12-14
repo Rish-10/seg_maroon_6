@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from recipes.models import User
 
@@ -20,6 +21,18 @@ class UserForm(forms.ModelForm):
 
         labels = {
             'is_private': 'Private profile',
+        }
+
+        widgets = {
+            'bio': forms.Textarea(attrs={
+                'rows': 8,
+                'placeholder': 'Let the world know who you are! (Max 8 lines, 300 characters)',
+                'class': 'form-control'
+            }),
+        }
+
+        help_texts = {
+            'bio': "Maximum 8 lines and 300 characters.",
         }
 
 class NewPasswordMixin(forms.Form):

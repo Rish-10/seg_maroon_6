@@ -26,7 +26,11 @@
       <h1>{{ profile_user.full_name }}</h1>
       <p class="handle">{{ profile_user.username }}</p>
 
-      <p class="bio">{{ profile_user.bio }}</p>
+      {% if profile_user.bio %}
+        <div class="profile-bio text-muted mt-2 mb-3 text-break">
+          {{ profile_user.bio|linebreaksbr }}
+        </div>
+      {% endif %}
 
       <div class="stats d-flex gap-4">
         <span>

@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView
 from django.urls import reverse
 from recipes.forms import UserForm
+from recipes.models import FollowRequest, User
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -49,3 +50,35 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["favourites"] = self.request.user.favourites.select_related("author").order_by("-created_at")
         return context
+
+    def form_valid(self, form):
+        # 1. Get the current user instance
+        user = self.object
+
+        # 2. Get the NEW privacy setting from the form
+        new_is_private = form.cleaned_data.get('is_private')
+
+        # 3. Get the OLD privacy setting from the database
+        # We query the DB directly to ensure we have the pre-save state
+        current_is_private = User.objects.get(pk=user.pk).is_private
+
+        # 4. Check if they are switching from PRIVATE -> PUBLIC
+        if current_is_private and not new_is_private:
+
+            # Find all people who want to follow this user
+            pending_requests = FollowRequest.objects.filter(requested_user=user)
+
+            for follow_request in pending_requests:
+                # AUTOMATICALLY ACCEPT:
+                # Add the current user to the requester's 'following' list.
+                # Since 'following' is a ManyToManyField on the User model, we use .add()
+                follow_request.follow_requester.following.add(user)
+
+                # Delete the request now that it is accepted
+                follow_request.delete()
+
+            if pending_requests.exists():
+                messages.info(self.request, f"Approved {pending_requests.count()} pending follow requests.")
+
+        # 5. Save the form changes to the database
+        return super().form_valid(form)
