@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from recipes.forms import ShoppingListItemForm
 from recipes.models import FollowRequest, User
+from recipes.models.notification import Notification
 from recipes.search_filters import filter_recipes  # <--- Import the helper
 
 def profile_page(request, username, section="posted_recipes"):
@@ -98,23 +99,32 @@ def follow_toggle(request, username):
         following_user.following.remove(user_to_follow)
         return redirect("profile_page", username=username)
 
-    pending_request = FollowRequest.objects.filter(
-        follow_requester=following_user,
-        requested_user=user_to_follow,
-    ).first()
+    pending_request = FollowRequest.objects.filter(follow_requester=following_user, requested_user=user_to_follow).first()
 
     if pending_request:
         pending_request.delete()
+        Notification.objects.filter(
+            recipient=user_to_follow,
+            sender=following_user,
+            notification_type='request'
+        ).delete()
         return redirect("profile_page", username=username)
 
     if user_to_follow.is_private:
-        FollowRequest.objects.create(
-            follow_requester=following_user,
-            requested_user=user_to_follow,
+        FollowRequest.objects.create(follow_requester=following_user, requested_user=user_to_follow)
+        Notification.objects.create(
+            recipient=user_to_follow,
+            sender=following_user,
+            notification_type='request'
         )
         return redirect("profile_page", username=username)
 
     following_user.following.add(user_to_follow)
+    Notification.objects.create(
+        recipient=user_to_follow,
+        sender=following_user,
+        notification_type='follow'
+    )
 
     next_url = request.POST.get("next")
     if next_url:

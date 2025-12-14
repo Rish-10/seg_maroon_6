@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from recipes.models import Recipe
+from recipes.models.notification import Notification
+
 
 @login_required
 def toggle_favourite(request, pk):
@@ -15,11 +17,24 @@ def toggle_favourite(request, pk):
         is_favourited = False
         message_text = f"Removed '{recipe.title}' from favourites."
         message_tag = "info"
+        Notification.objects.filter(
+            recipient=recipe.author,
+            sender=request.user,
+            target_object=recipe,
+            notification_type='favourite'
+        ).delete()
     else:
         request.user.favourites.add(recipe)
         is_favourited = True
         message_text = f"Added '{recipe.title}' to favourites."
         message_tag = "success"
+        if recipe.author != request.user:
+            Notification.objects.create(
+                recipient=recipe.author,
+                sender=request.user,
+                target_object=recipe,
+                notification_type='favourite'
+            )
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
         return JsonResponse({'is_favourited': is_favourited,
