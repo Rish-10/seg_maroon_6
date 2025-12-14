@@ -1,34 +1,35 @@
 {% extends 'base_content.html' %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-5 recipe-create-page">
+    <div class="mb-4">
+        <p class="text-uppercase text-muted small mb-1">
+            {% if is_edit %}Edit{% else %}Create{% endif %}
+        </p>
+        <h1 class="mb-0">
+            {% if is_edit %}
+                Update Your Recipe
+            {% else %}
+                Share a New Recipe
+            {% endif %}
+        </h1>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-
-            <div class="card shadow-lg border-0 rounded-3">
-
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <h3 class="mb-0 fw-bold">
-                        {% if is_edit %}
-                            Edit Recipe
-                        {% else %}
-                            Create New Recipe
-                        {% endif %}
-                    </h3>
-                </div>
-
+        <div class="col-lg-8">
+            <div class="card">
                 <div class="card-body p-4">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
 
                         {% for field in form %}
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-secondary">{{ field.label }}</label>
+                            <div class="mb-4">
+                                <label class="form-label">{{ field.label }}</label>
                                 {{ field }}
                             </div>
                         {% endfor %}
 
-                        <h3 class="fs-5 mt-4">Images</h3>
+                        <h2 class="h4 mt-5 mb-3">Recipe Images</h2>
                         {{ formset.management_form }}
                         {% for image_form in formset %}
                             <div class="card mb-3">
@@ -60,15 +61,15 @@
                         {% endfor %}
 
 
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                        <div class="d-flex gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary flex-fill">
                                 {% if is_edit %}
-                                    Save changes
+                                    Save Changes
                                 {% else %}
-                                    Post Recipe
+                                    Create Recipe
                                 {% endif %}
                             </button>
-                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary flex-fill">
                                 Cancel
                             </a>
                         </div>

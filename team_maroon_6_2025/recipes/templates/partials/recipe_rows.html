@@ -1,26 +1,47 @@
-<div class="list-group">
+<div class="row g-4">
   {% for recipe in recipes %}
-    <div class="list-group-item">
-      <div class="d-flex">
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="recipe-card d-flex flex-column">
+        <!-- Top: Title and Description -->
+        <div class="recipe-card-header p-3">
+          <h5 class="mb-1">
+            <a class="text-decoration-none" href="{% url 'recipe_detail' recipe.pk %}">
+              {{ recipe.title }}
+            </a>
+          </h5>
+          <p class="mb-1 text-truncate-2">{{ recipe.description|default:"No description yet." }}</p>
+          {% if show_author != False %}
+            <small class="text-muted">by <a href="{% url 'profile_page' recipe.author.username %}">{{ recipe.author.username }}</a></small>
+          {% endif %}
+        </div>
+
+        <!-- Middle: Image -->
         {% with preview=recipe.images.first %}
           {% if preview %}
-            <div class="me-3" style="width: 150px; height: 150px; overflow: hidden;">
-              <img src="{{ preview.image.url }}" class="img-thumbnail" alt="{{ preview.caption|default:'Recipe image' }}">
+            <div class="recipe-card-image" style="aspect-ratio: 1 / 1; overflow: hidden; background: #f8f8f8; display: flex; align-items: center; justify-content: center;">
+              <img src="{{ preview.image.url }}" class="w-100 h-100" alt="{{ preview.caption|default:'Recipe image' }}" style="object-fit: contain;">
+            </div>
+          {% else %}
+            <div class="recipe-card-image" style="aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #E8E5DF;">
+              <i class="bi bi-egg-fried" style="font-size: 4rem; color: #800020;"></i>
             </div>
           {% endif %}
         {% endwith %}
-        <div class="flex-grow-1 d-flex justify-content-between align-items-start">
-          <div>
-            <h5 class="mb-1">
-              <a class="text-decoration-none" href="{% url 'recipe_detail' recipe.pk %}">
-                {{ recipe.title }}
-              </a>
-            </h5>
-            <p class="mb-1">{{ recipe.description|default:"No description yet." }}</p>
-              {% if show_author != False %}
-                <small>by <a href="{% url 'profile_page' recipe.author.username %}">{{ recipe.author.username }}</a></small>
-              {% endif %}
+
+        <!-- Bottom: Ratings, Categories, and Buttons -->
+        <div class="recipe-card-footer p-3 mt-auto">
+          <!-- Categories -->
+          {% if recipe.categories.exists %}
             <div class="mb-2">
+              {% for category in recipe.categories.all|slice:":2" %}
+                <span class="badge bg-secondary me-1 mb-1">{{ category.label }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Rating Display -->
+          <div class="mb-2 d-flex justify-content-between align-items-center">
+            <div>
               {% for star in star_range %}
                 {% if recipe.rating_avg|default:0 >= star %}
                   <i class="bi bi-star-fill text-warning"></i>
@@ -28,96 +49,28 @@
                   <i class="bi bi-star text-warning"></i>
                 {% endif %}
               {% endfor %}
-              <small class="ms-1 text-muted">
-                {{ recipe.rating_avg|default:0|floatformat:1 }} ({{ recipe.rating_total|default:0 }} ratings)
-              </small>
+              <small class="ms-1 text-muted">{{ recipe.rating_avg|default:0|floatformat:1 }}</small>
             </div>
-
-            {% if recipe.categories.exists %}
-              <div class="mb-2">
-                {% for category in recipe.categories.all %}
-                  <span class="badge bg-secondary me-1">{{ category.label }}</span>
-                {% endfor %}
-              </div>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-              <form method="post" action="{% url 'recipe_rate' recipe.pk %}">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                <div class="d-inline-flex gap-1">
-                  {% for star in star_range %}
-                    <button
-                        type="submit"
-                        name="rating"
-                        value="{{ star }}"
-                        class="btn btn-link p-0 border-0"
-                        title="Rate {{ star }} star{% if star > 1 %}s{% endif %}"
-                    >
-                      {% if recipe.user_rating_value|default:0 >= star %}
-                        <i class="bi bi-star-fill text-primary fs-5"></i>
-                      {% else %}
-                        <i class="bi bi-star text-primary fs-5"></i>
-                      {% endif %}
-                    </button>
-                  {% endfor %}
-                </div>
-              </form>
-            {% else %}
-              <small class="text-muted">Log in to rate.</small>
-            {% endif %}
+            <small class="text-muted">{{ recipe.created_at|date:"d M Y" }}</small>
           </div>
-          <div class="text-end">
-            <small class="d-block">{{ recipe.created_at|date:"d M Y H:i" }}</small>
-            <button
-              type="button"
-              class="btn btn-sm fav-btn mt-2
-                {% if user.is_authenticated and recipe in user.favourites.all %}
-                  btn-outline-danger
-                {% else %}
-                  btn-outline-primary
-                {% endif %}"
-              data-url="{% url 'recipe_favourite_toggle' recipe.pk %}"
-              data-recipe-id="{{ recipe.pk }}">
 
-              {% if user.is_authenticated and recipe in user.favourites.all %}
-                Unfavourite
-              {% else %}
-                Favourite
-              {% endif %}
-            </button>
-
-            <form method="post" action="{% url 'recipe_like_toggle' recipe.pk %}" class="mt-2">
+          <!-- Action Buttons -->
+          <div class="d-flex gap-2">
+            <form method="post" action="{% url 'recipe_favourite_toggle' recipe.pk %}" class="flex-fill">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.path }}">
-              {% if user.is_authenticated and user in recipe.likes.all %}
-                <button class="btn btn-sm btn-outline-success" type="submit">Unlike</button>
+              {% if user.is_authenticated and recipe in user.favourites.all %}
+                <button class="btn btn-sm btn-outline-danger w-100" type="submit">
+                  <i class="bi bi-heart-fill"></i> Favorited
+                </button>
               {% else %}
-                <button class="btn btn-sm btn-success" type="submit">Like</button>
+                <button class="btn btn-sm btn-outline-primary w-100" type="submit">
+                  <i class="bi bi-heart"></i> Favorite
+                </button>
               {% endif %}
             </form>
-            <span class="badge bg-light text-dark mt-2 d-inline-block">Likes: {{ recipe.likes_count }}</span>
 
-            {% if user.is_authenticated and recipe.author == user %}
-              <a href="{% url 'recipe_edit' recipe.pk %}"
-                 class="btn btn-sn btn-outline-secondary ms-2">
-                Edit recipe
-              </a>
-            {% endif %}
-
-            <div class="mt-3">
-              {% for comment in recipe.comments.all|slice:":3" %}
-                <div class="border bg-light p-2 mb-2">
-                  <small><strong>{{ comment.author.username }}</strong> • {{ comment.created_at|date:"d M Y H:i" }}</small>
-                  <p class="mb-0">{{ comment.body }}</p>
-                </div>
-              {% empty %}
-                <p class="text-muted mb-0">No comments yet.</p>
-              {% endfor %}
-              {% if recipe.comments.count > 3 %}
-                <a href="{% url 'recipe_detail' recipe.pk %}">View all comments</a>
-              {% endif %}
-            </div>
+            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-dark flex-fill">View Recipe</a>
           </div>
         </div>
       </div>
