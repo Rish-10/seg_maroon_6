@@ -1,16 +1,449 @@
-/*
- * Alerts
- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 
-.alert {
-  border-radius: 0px;
+/* auth page headings use Playfair Display */
+.container.py-5 h1 {
+  font-family: 'Playfair Display', serif;
 }
 
+/* landing page styles */
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  color: #800020;
+  font-size: 4.5rem;
+  letter-spacing: -0.02em;
+}
 
-/*
- * Cover page
- */
+.hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  color: #000;
+}
 
+/* beige background for all main pages */
+body:has(.explore-page), body:has(.recipe-list-page), body:has(.recipe-create-page),
+body:has(.profile-page), body:has(.user-profile-page), body:has(.inbox-page),
+body:has(.recipe-detail-page), body:has(.container.py-5:first-child) {
+  background: #F5F2ED !important;
+  min-height: 100vh !important;
+}
+
+/* default font and color for pages */
+.explore-page, .recipe-list-page, .recipe-create-page, .profile-page,
+.user-profile-page, .inbox-page, .recipe-detail-page {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  color: #000 !important;
+}
+
+/* all headings use Playfair Display for consistency */
+.explore-page h1, .explore-page h2, .explore-page h3,
+.recipe-list-page h1, .recipe-list-page h2, .recipe-list-page h3,
+.recipe-create-page h1, .recipe-create-page h2,
+.profile-page h1, .profile-page h2,
+.user-profile-page h1, .user-profile-page h2,
+.inbox-page h1, .inbox-page h2,
+.recipe-detail-page h1, .recipe-detail-page h3, .recipe-detail-page .h4,
+.recipe-detail-page .recipe-title {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 600 !important;
+  color: #000 !important;
+}
+
+/* small text styling */
+.explore-page .text-muted, .recipe-list-page .text-muted,
+.recipe-create-page .text-muted, .profile-page .text-muted,
+.inbox-page .text-muted {
+  color: #666 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 500 !important;
+}
+
+/* form inputs - black border with maroon focus */
+.explore-page .form-control, .explore-page .form-select,
+.recipe-list-page .form-control, .recipe-list-page .form-select,
+.recipe-create-page .form-control, .recipe-create-page .form-select, .recipe-create-page textarea,
+.profile-page .form-control, .profile-page .form-select, .profile-page textarea,
+.recipe-detail-page .form-control,
+.card.rounded-0 .form-control, .card.rounded-0 .form-select, .card.rounded-0 textarea {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  padding: 0.875rem 1.25rem !important;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+
+.explore-page .form-control:focus, .explore-page .form-select:focus,
+.recipe-list-page .form-control:focus, .recipe-list-page .form-select:focus,
+.recipe-create-page .form-control:focus, .recipe-create-page .form-select:focus, .recipe-create-page textarea:focus,
+.profile-page .form-control:focus, .profile-page .form-select:focus, .profile-page textarea:focus,
+.recipe-detail-page .form-control:focus,
+.card.rounded-0 .form-control:focus, .card.rounded-0 .form-select:focus, .card.rounded-0 textarea:focus {
+  background: #fff !important;
+  border-color: #800020 !important;
+  box-shadow: 0 4px 12px rgba(128, 0, 32, 0.1) !important;
+}
+
+.recipe-list-page .form-label, .recipe-list-page .card .form-label,
+.recipe-create-page .form-label, .profile-page .form-label {
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #000 !important;
+}
+
+/* cards have maroon left border */
+.explore-page .card, .recipe-list-page .card, .recipe-create-page .card,
+.inbox-page .card.recipe-card-small, .recipe-detail-page .card,
+.recipe-card, .card.rounded-0 {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: none !important;
+  border-left: 4px solid #800020 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+/* list items same as cards */
+.explore-page .list-group-item, .recipe-list-page .list-group-item,
+.profile-page .list-group-item, .inbox-page .list-group-item {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: none !important;
+  border-left: 4px solid #800020 !important;
+  border-radius: 0 !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.explore-page .list-group-item:hover, .recipe-list-page .list-group-item:hover,
+.profile-page .list-group-item:hover, .inbox-page .list-group-item:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* button colors differ by page - explore/list/create use black */
+.explore-page .btn-primary, .recipe-list-page .btn-primary,
+.recipe-create-page .btn-primary, .profile-page .btn-primary {
+  background: #000 !important;
+  color: #F5F2ED !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.explore-page .btn-primary:hover, .recipe-list-page .btn-primary:hover,
+.recipe-create-page .btn-primary:hover, .profile-page .btn-primary:hover {
+  background: #1a1a1a !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* user profile and recipe detail pages use maroon buttons */
+.user-profile-page .btn-primary, .recipe-detail-page .btn-primary, .btn-primary {
+  background: #800020 !important;
+  color: #fff !important;
+  border-color: #800020 !important;
+  border-radius: 0 !important;
+}
+
+.user-profile-page .btn-primary:hover, .recipe-detail-page .btn-primary:hover, .btn-primary:hover {
+  background: #600018 !important;
+  border-color: #600018 !important;
+}
+
+/* outline buttons */
+.explore-page .btn-outline-primary, .recipe-list-page .btn-outline-secondary,
+.recipe-create-page .btn-outline-secondary, .recipe-detail-page .btn-outline-primary,
+.recipe-detail-page .btn-outline-secondary, .user-profile-page .recipe-card .btn-outline-primary,
+.btn-outline-secondary {
+  color: #000 !important;
+  border: 2px solid #000 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.explore-page .btn-outline-primary:hover, .recipe-list-page .btn-outline-secondary:hover,
+.recipe-create-page .btn-outline-secondary:hover, .recipe-detail-page .btn-outline-primary:hover,
+.recipe-detail-page .btn-outline-secondary:hover, .user-profile-page .recipe-card .btn-outline-primary:hover,
+.btn-outline-secondary:hover {
+  background: #000 !important;
+  color: #F5F2ED !important;
+  border-color: #000 !important;
+}
+
+/* remove from favorites uses maroon */
+.recipe-detail-page .btn-outline-danger {
+  color: #800020 !important;
+  border: 2px solid #800020 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.recipe-detail-page .btn-outline-danger:hover {
+  background: #800020 !important;
+  color: #fff !important;
+}
+
+.user-profile-page .btn-secondary, .recipe-detail-page .btn-success,
+.recipe-detail-page .btn-outline-success {
+  background: #000 !important;
+  color: #F5F2ED !important;
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+}
+
+.user-profile-page .btn-secondary:hover, .recipe-detail-page .btn-success:hover,
+.recipe-detail-page .btn-outline-success:hover {
+  background: #1a1a1a !important;
+}
+
+.recipe-detail-page .btn-link {
+  color: #000 !important;
+  text-decoration: none !important;
+}
+
+.recipe-detail-page .btn-link:hover {
+  color: #800020 !important;
+}
+
+.btn.rounded-0 {
+  border-radius: 0 !important;
+}
+
+/* view recipe buttons - black with maroon hover */
+.btn-dark, .btn-dark:focus, .btn-dark:active, .btn-dark:visited {
+  background: #000 !important;
+  border-color: #000 !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-dark:hover, .btn-dark:focus:hover, .btn-dark:active:hover {
+  background: #800020 !important;
+  border-color: #800020 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 10px rgba(128, 0, 32, 0.2) !important;
+}
+
+/* tabs on user profile page */
+.user-profile-page .nav-tabs .nav-link {
+  color: #000 !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  font-weight: 500 !important;
+}
+
+.user-profile-page .nav-tabs .nav-link:hover {
+  color: #800020 !important;
+  border-bottom-color: #800020 !important;
+}
+
+.user-profile-page .nav-tabs .nav-link.active {
+  color: #800020 !important;
+  background: transparent !important;
+  border-bottom: 2px solid #800020 !important;
+  font-weight: 600 !important;
+}
+
+/* nav pills for recipe filters */
+.recipe-list-page .nav-pills .nav-link {
+  border-radius: 0 !important;
+  color: #000 !important;
+  font-weight: 500 !important;
+  border: 2px solid transparent !important;
+}
+
+.recipe-list-page .nav-pills .nav-link.active {
+  background: #000 !important;
+  color: #F5F2ED !important;
+}
+
+.recipe-list-page .nav-pills .nav-link:hover:not(.active) {
+  color: #000 !important;
+  border-color: #000 !important;
+}
+
+/* badges - no rounded corners */
+.badge {
+  border-radius: 0 !important;
+}
+
+.profile-page .badge.bg-secondary, .inbox-page .badge.bg-secondary,
+.recipe-detail-page .badge.bg-secondary, .recipe-card .badge.bg-secondary {
+  background: #800020 !important;
+  color: #fff !important;
+}
+
+.recipe-detail-page .badge.bg-light {
+  background: #E8E5DF !important;
+  color: #000 !important;
+}
+
+/* links are black by default, maroon on hover */
+.explore-page a, .recipe-list-page a, .user-profile-page a, .recipe-detail-page a {
+  color: #000 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.explore-page a:hover, .recipe-list-page a:hover,
+.user-profile-page a:hover, .recipe-detail-page a:hover {
+  color: #800020 !important;
+}
+
+/* profile page links are reversed */
+.profile-page a {
+  color: #800020 !important;
+}
+
+.profile-page a:hover {
+  color: #000 !important;
+  text-decoration: underline !important;
+}
+
+/* star ratings use maroon color */
+.recipe-detail-page .bi-star, .recipe-detail-page .bi-star-fill,
+.recipe-card .bi-star, .recipe-card .bi-star-fill {
+  color: #800020 !important;
+}
+
+.recipe-detail-page .text-primary {
+  color: #800020 !important;
+}
+
+.recipe-detail-page .breadcrumb {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.recipe-detail-page .breadcrumb-item.active {
+  color: #666 !important;
+}
+
+/* category boxes on explore page */
+.explore-page .category-box {
+  display: block !important;
+  background: #000 !important;
+  color: #fff !important;
+  padding: 0.75rem 1.25rem !important;
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 600 !important;
+  border-left: 3px solid #800020 !important;
+  transition: all 0.3s ease !important;
+}
+
+.explore-page .category-box:hover {
+  background: #1a1a1a !important;
+  transform: translateX(5px) !important;
+}
+
+/* recipe info sidebar on detail page */
+.recipe-detail-page .recipe-info-card .card-header {
+  background: #000 !important;
+  color: #F5F2ED !important;
+  border: none !important;
+  font-family: 'Playfair Display', serif !important;
+}
+
+/* rating boxes */
+.recipe-detail-page .rating-display, .recipe-detail-page .rating-input {
+  padding: 1rem !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-left: 3px solid #800020 !important;
+  min-height: 120px !important;
+}
+
+.inbox-page .alert, .recipe-detail-page .recipe-description {
+  border: none !important;
+  border-left: 4px solid #800020 !important;
+  border-radius: 0 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.alert {
+  border-radius: 0;
+}
+
+.img-thumbnail {
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+/* navbar - pure black */
+.navbar {
+  background: #000 !important;
+  padding: 1.25rem 1rem !important;
+}
+
+.navbar-brand {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 1.75rem !important;
+  font-family: 'Playfair Display', serif !important;
+}
+
+.navbar .nav-link {
+  color: #fff !important;
+  font-weight: 500 !important;
+}
+
+.navbar .nav-link:hover, .navbar .nav-link.active {
+  color: #F5F2ED !important;
+}
+
+.navbar .btn-primary {
+  background: #800020 !important;
+  border-color: #800020 !important;
+}
+
+.navbar .btn-primary:hover {
+  background: #660019 !important;
+}
+
+.navbar .btn-outline-primary {
+  color: #800020 !important;
+  border-color: #800020 !important;
+}
+
+.navbar .btn-outline-primary:hover, .navbar .btn-check:checked + .btn-outline-primary {
+  background: #800020 !important;
+  color: #fff !important;
+}
+
+.navbar .btn-outline-light {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.navbar .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* recipe card styling */
+.recipe-card h5 {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 600 !important;
+  color: #000 !important;
+}
+
+.recipe-card .text-muted {
+  color: #000 !important;
+}
+
+/* truncate description to 2 lines */
+.text-truncate-2 {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* old styles from original template - keeping for compatibility */
 .content {
   padding-top: 10px;
 }
@@ -20,14 +453,11 @@
   height: 100vh;
 }
 
-.vcenter-item{
-    display: flex;
-    align-items: center;
+.vcenter-item {
+  display: flex;
+  align-items: center;
 }
 
-/*
- * Cover page
- */
 h1.cover-heading {
   font-size: 4rem;
 }
@@ -39,20 +469,14 @@ p.cover-text {
 .cover-card {
   background-color: rgba(245, 245, 245, 0.6);
   max-width: 30rem;
-  padding-top: 30px;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-bottom: 30px;
+  padding: 30px 50px;
   border-radius: 15%;
 }
+
 .cover-card-block {
-  opacity: 1
+  opacity: 1;
 }
 
-
-/*
- * forms
- */
 .nolabel label {
   display: none;
 }
@@ -63,12 +487,8 @@ ul.errorlist {
   margin: 0;
 }
 
-/*
- * Typefaces
- */
-
 .low-key {
-  color: #777777;
+  color: #777;
   font-weight: 300;
 }
 
@@ -77,38 +497,32 @@ ul.errorlist {
   margin-bottom: 20px;
 }
 
-/*
- * Profile
- */
 .profile-image {
   width: 120px;
-  clear:both;
-  float:left;
+  clear: both;
+  float: left;
 }
 
 .profile-text {
-  overflow:hidden;
-  padding-left:20px
+  overflow: hidden;
+  padding-left: 20px;
 }
 
 h3.profile-title {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .profile-username {
-  color: #777777;
+  color: #777;
   font-weight: 300;
   font-style: italic;
 }
 
-
-/*
- * Hyperlinks
- */
 .content a {
   text-decoration: none;
   color: #0d6efd;
 }
+
 .content a:hover {
   text-decoration: underline;
   color: #0d6efd;

@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
 {% block body %}
-  <div class="container vh-100">
-    <div class="row h-100">
-      <div class="col-12 my-auto">
-        <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-7">
-          <h1 class="cover-heading">Recipify</h1>
-          <p class="cover-text">A recipe sharing app by Team <i>Insert team name here (or revise this home screen as you see fit)</i></p>
-          <p>
-            <a href='{% url 'sign_up' %}' class="btn btn-lg btn-secondary">
-              Sign up
-            </a>
+  <div class="vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #F5F2ED 0%, #E8E5DF 100%);">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-12 col-md-6 text-center text-md-start">
+          <h1 class="display-1 fw-bold mb-3 hero-title">Recipify</h1>
+          <p class="fs-4 mb-3 hero-subtitle">Share recipes, discover flavors</p>
+          <p class="fs-6 text-muted mb-5" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+            Join our community of food enthusiasts. Share your favorite recipes,
+            discover new dishes, and connect with fellow home cooks.
           </p>
-          <p>
-            <a href='{% url 'log_in' %}' class="btn btn-lg btn-secondary">
-              Log in
-            </a>
-          </p>
+          <div class="mt-5">
+            <a href='{% url 'sign_up' %}' class="btn btn-lg btn-primary me-3 mb-3">Get Started</a>
+            <a href='{% url 'log_in' %}' class="btn btn-lg btn-outline-secondary mb-3">Log In</a>
+          </div>
+        </div>
+        <div class="col-md-6 d-none d-md-flex justify-content-center">
+          <i class="bi bi-egg-fried" style="font-size: 15rem; color: #800020; opacity: 0.15;"></i>
         </div>
       </div>
     </div>

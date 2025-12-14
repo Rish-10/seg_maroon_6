@@ -1,8 +1,7 @@
 {% extends "base_content.html" %}
 {% block content %}
-<div class="container py-5">
+<div class="container py-5 explore-page">
   <header class="text-center mb-5">
-    <!-- <p class="text-uppercase text-muted small">Pinch-of-Yum inspired</p> -->
     <h1 class="display-4">{{ hero_title }}</h1>
     <p class="lead">{{ hero_body }}</p>
     <form method="get" action="{% url 'recipe_list' %}" class="d-flex justify-content-center gap-2 mt-4">
@@ -31,7 +30,7 @@
           <ul class="list-unstyled">
             {% for category in column %}
               <li class="mb-2">
-                <a href="{% url 'recipe_list' %}?include={{ category.id }}" class="text-decoration-none">
+                <a href="{% url 'recipe_list' %}?include={{ category.id }}" class="category-box">
                   {{ category.label }}
                 </a>
               </li>

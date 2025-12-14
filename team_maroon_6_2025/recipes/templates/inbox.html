@@ -1,83 +1,75 @@
 {% extends 'base_content.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="bi bi-inbox"></i> Activity Inbox</h3>
-                </div>
-                <div class="card-body">
+<div class="container py-5 inbox-page">
+    <div class="mb-4">
+        <p class="text-uppercase text-muted small mb-1">Notifications</p>
+        <h1 class="mb-0">Activity Inbox</h1>
+    </div>
 
-                    <section class="mb-5">
-                        <h4 class="mb-3">
-                            <i class="bi bi-chat-dots"></i> Comments on Your Recipes
-                        </h4>
+    <div class="row">
+        <div class="col-12">
+            <section class="mb-5">
+                <h2 class="h4 mb-3">Comments on Your Recipes</h2>
 
-                        {% if new_comments %}
-                            <div class="list-group">
-                                {% for comment in new_comments %}
-                                    <a href="{% url 'recipe_detail' comment.recipe.pk %}"
-                                       class="list-group-item list-group-item-action">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">
-                                                <strong>{{ comment.author.username }}</strong>
-                                                commented on
-                                                <em>"{{ comment.recipe.title }}"</em>
-                                            </h5>
-                                            <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
-                                        </div>
-                                        <p class="mb-1">{{ comment.body|truncatewords:20 }}</p>
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> No comments on your recipes yet.
-                            </div>
-                        {% endif %}
-                    </section>
+                {% if new_comments %}
+                    <div class="list-group">
+                        {% for comment in new_comments %}
+                            <a href="{% url 'recipe_detail' comment.recipe.pk %}"
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">
+                                        <strong>{{ comment.author.username }}</strong>
+                                        commented on
+                                        <em>"{{ comment.recipe.title }}"</em>
+                                    </h5>
+                                    <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">{{ comment.body|truncatewords:20 }}</p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-light text-center">
+                        No comments on your recipes yet.
+                    </div>
+                {% endif %}
+            </section>
 
-                    <section>
-                        <h4 class="mb-3">
-                            <i class="bi bi-heart-fill text-danger"></i> Your Recipes with Likes
-                        </h4>
+            <section class="mb-5">
+                <h2 class="h4 mb-3">Your Recipes with Likes</h2>
 
-                        {% if liked_recipes %}
-                            <div class="row">
-                                {% for recipe in liked_recipes %}
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <h5 class="card-title">
-                                                    <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none">
-                                                        {{ recipe.title }}
-                                                    </a>
-                                                </h5>
-                                                <p class="card-text">
-                                                    <span class="badge bg-danger">
-                                                        {{ recipe.likes.count }}
-                                                        {% if recipe.likes.count == 1 %}like{% else %}likes{% endif %}
-                                                    </span>
-                                                </p>
-                                                <small class="text-muted">
-                                                    Last updated: {{ recipe.updated_at|timesince }} ago
-                                                </small>
-                                            </div>
+                {% if liked_recipes %}
+                    <div class="row g-3">
+                        {% for recipe in liked_recipes %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card recipe-card-small">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{% url 'recipe_detail' recipe.pk %}">
+                                                {{ recipe.title }}
+                                            </a>
+                                        </h5>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <span class="badge bg-secondary">
+                                                {{ recipe.likes.count }}
+                                                {% if recipe.likes.count == 1 %}like{% else %}likes{% endif %}
+                                            </span>
+                                            <small class="text-muted">
+                                                {{ recipe.updated_at|timesince }} ago
+                                            </small>
                                         </div>
                                     </div>
-                                {% endfor %}
+                                </div>
                             </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> None of your recipes have likes yet.
-                            </div>
-                        {% endif %}
-                    </section>
-
-                </div>
-            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-light text-center">
+                        None of your recipes have likes yet.
+                    </div>
+                {% endif %}
+            </section>
         </div>
     </div>
 </div>
