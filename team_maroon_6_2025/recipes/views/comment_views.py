@@ -25,11 +25,8 @@ def add_comment(request, pk):
                 target_object=comment,
                 notification_type='comment'
             )
-            return redirect(request.POST.get("next") or reverse("recipe_detail", args=[pk]))
-    else:
-        form = CommentForm()
 
-    return render(request, "recipes/partials/comment_form.html", {"form": form, "recipe": recipe})
+    return redirect(request.POST.get("next") or reverse("recipe_detail", args=[pk]))
 
 
 @login_required

@@ -76,6 +76,12 @@ def dashboard(request):
     for recipe in recipes: 
         recipe.user_rating_value = user_ratings.get(recipe.id)
 
+    top_rated_recipes = list(
+        recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:3]
+    )
+    latest_recipes = list(recipes_qs.order_by("-created_at")[:3])
+    featured_recipes = list(recipes_qs.order_by("-likes_total", "-created_at")[:3])
+
     categories = list(Category.objects.order_by("label"))
     column_size = max(1, math.ceil(len(categories) / 3))
     category_columns = [
@@ -90,7 +96,6 @@ def dashboard(request):
             "recipes": recipes,
             "star_range": range(1, 6),
             "active_sort": sort,
-            "query": request.GET.get("q", ""),
             "categories": categories,
             "category_columns": category_columns,
             "top_rated_recipes": top_rated_recipes,

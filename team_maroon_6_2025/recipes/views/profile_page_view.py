@@ -1,5 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+
+from recipes.forms import ShoppingListItemForm
+from recipes.models import FollowRequest, User
 
 from recipes.forms import ShoppingListItemForm
 from recipes.models import FollowRequest, User
@@ -63,6 +67,14 @@ def profile_page(request, username, section="posted_recipes"):
     user_recipes = filter_recipes(request, user_recipes)
 
     # 3. Handle Shopping List (if active)
+    shopping_list_items = None
+    shopping_form = ShoppingListItemForm()
+    if section == "shopping_list":
+        if is_me:
+            shopping_list_items = profile_user.shopping_list_items.order_by("is_checked", "name")
+        else:
+            section = "posted_recipes"
+
     shopping_list_items = None
     shopping_form = ShoppingListItemForm()
     if section == "shopping_list":
