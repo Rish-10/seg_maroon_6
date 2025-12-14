@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from recipes.forms import CommentForm
-from recipes.models import Comment, Recipe
+from recipes.models import Comment, Recipe, Notification
 
 
 @login_required
@@ -19,6 +19,12 @@ def add_comment(request, pk):
             comment.author = request.user
             comment.save()
             messages.success(request, "Comment posted.")
+            Notification.objects.create(
+                recipient=recipe.author,
+                sender=request.user,
+                target_object=comment,
+                notification_type='comment'
+            )
             return redirect(request.POST.get("next") or reverse("recipe_detail", args=[pk]))
     else:
         form = CommentForm()

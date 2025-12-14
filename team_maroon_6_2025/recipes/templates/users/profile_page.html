@@ -1,4 +1,4 @@
-{% extends 'base_content.html' %}
+{% extends "base_recipe_content.html" %}
 {% block content %}
 <div class="container user-profile-page">
   <div class="profile-header">
@@ -26,12 +26,24 @@
       <h1>{{ profile_user.full_name }}</h1>
       <p class="handle">{{ profile_user.username }}</p>
 
-      <p class="bio">{{ profile_user.bio }}</p>
+      {% if profile_user.bio %}
+        <div class="profile-bio text-muted mt-2 mb-3 text-break">
+          {{ profile_user.bio|linebreaksbr }}
+        </div>
+      {% endif %}
 
-      <div class="stats">
-        <span><strong>{{ profile_user.recipes.count }}</strong> Recipes</span>
-        <span><strong>{{ profile_user.follower_count }}</strong> Followers</span>
-        <span><strong>{{ profile_user.following_count }}</strong> Following</span>
+      <div class="stats d-flex gap-4">
+        <span>
+          <strong>{{ profile_user.recipes.count }}</strong> Recipes
+        </span>
+  
+        <a href="{% url 'follow_list' profile_user.username 'followers' %}" class="text-decoration-none text-dark">
+          <strong>{{ profile_user.follower_count }}</strong> Followers
+        </a>
+
+        <a href="{% url 'follow_list' profile_user.username 'following' %}" class="text-decoration-none text-dark">
+          <strong>{{ profile_user.following_count }}</strong> Following
+        </a>
       </div>
 
       {% if request.user.is_authenticated and request.user != profile_user %}
@@ -126,7 +138,6 @@
         {% if current_section == 'shopping_list' %}
           {% include "users/shopping_list.html" %}
         {% endif %}
-
       {% endif %}
     </div>
   </div>

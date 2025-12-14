@@ -1,7 +1,15 @@
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
+
+
+def validate_bio_lines(value):
+    """Refuse input if it has more than 8 lines."""
+    if len(value.splitlines()) > 8:
+        raise ValidationError("Bio cannot exceed 8 lines.")
 
 class User(AbstractUser):
     """Model used for user authentication, and team member related information."""
@@ -18,7 +26,11 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     favourites = models.ManyToManyField('recipes.Recipe', related_name='favourited_by', blank=True)
-    bio = models.TextField(blank=True, max_length=500)
+    bio = models.TextField(
+        max_length=300,
+        blank=True,
+        validators=[validate_bio_lines]
+    )
     following = models.ManyToManyField('self', related_name='followers', symmetrical=False, blank=True)
     is_private = models.BooleanField(
         default=False,
@@ -54,3 +66,15 @@ class User(AbstractUser):
     @property
     def following_count(self):
         return self.following.count()
+
+class FollowRequest(models.Model):
+    follow_requester = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_sent', on_delete=models.CASCADE)
+    requested_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_received', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('follow_requester', 'requested_user') # Prevent duplicate requests
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.follow_requester} wants to follow {self.requested_user}"

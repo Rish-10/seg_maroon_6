@@ -1,19 +1,16 @@
 from itertools import chain 
-
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, get_object_or_404
 from django.forms import inlineformset_factory
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from django.db import models 
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count
 
 from recipes.models import Category, Recipe, RecipeImage, RecipeRating
 from recipes.forms import RecipeForm, CommentForm, RecipeImageForm, RecipeRatingForm
-
+from recipes.search_filters import filter_recipes  # Import the helper
 
 RecipeImageFormSet = inlineformset_factory(
     Recipe,
@@ -23,12 +20,8 @@ RecipeImageFormSet = inlineformset_factory(
     can_delete=True,
 )
 
-
 def recipe_list(request):
     sort = request.GET.get("sort", "newest")
-    query = (request.GET.get("q") or "").strip()
-    include_ids = [int(x) for x in request.GET.getlist("include") if x.isdigit()]
-    exclude_ids = [int(x) for x in request.GET.getlist("exclude") if x.isdigit()]
     ordering_map = {
         "newest": ("-created_at",),
         "likes": ("-likes_total", "-created_at"),
@@ -37,6 +30,7 @@ def recipe_list(request):
         "title": ("title",),
     }
 
+    # 1. Base Query
     recipes_qs = (
         Recipe.objects.select_related("author")
         .prefetch_related("comments__author", "categories")
@@ -48,35 +42,25 @@ def recipe_list(request):
         )
     )
 
-    if query:
-        recipes_qs = recipes_qs.filter(
-            Q(title__icontains=query)
-            | Q(description__icontains=query)
-            | Q(ingredients__icontains=query)
-        )
+    # 2. APPLY FILTERING
+    # Replaces all the manual 'if query', 'if include_ids' logic
+    recipes_qs = filter_recipes(request, recipes_qs)
 
-    if include_ids:
-        recipes_qs = recipes_qs.filter(categories__id__in=include_ids)
-
-    if exclude_ids:
-        recipes_qs = recipes_qs.exclude(categories__id__in=exclude_ids)
-
-    recipes_qs = recipes_qs.distinct()
+    # 3. Ordering and List Generation
     ordering = ordering_map.get(sort, ("-created_at",))
-
     feed_recipes = list(recipes_qs.order_by(*ordering))
+    
     following_recipes = []
-
     if request.user.is_authenticated:
         following_ids = list(
             request.user.following.values_list("id", flat=True)
         )
         if following_ids:
-            following_recipes = list(
-                recipes_qs.filter(author_id__in=following_ids)
-                .order_by(*ordering)
-            )
+            # We also apply the filters to the "Following" tab
+            following_qs = recipes_qs.filter(author_id__in=following_ids)
+            following_recipes = list(following_qs.order_by(*ordering))
 
+    # 4. Handle User Ratings
     user_ratings = {}
     if request.user.is_authenticated:
         recipe_ids = {r.id for r in chain(feed_recipes, following_recipes)}
@@ -103,13 +87,14 @@ def recipe_list(request):
             "categories": categories,
             "star_range": range(1, 6),
             "active_sort": sort,
-            "query": query,
-            "selected_includes": include_ids,
-            "selected_excludes": exclude_ids,
+            "query": request.GET.get("q", ""),
+            # We no longer strictly need selected_includes/excludes here 
+            # because the Context Processor handles the Navbar state.
         },
     )
 
-
+# ... (The rest of your functions: recipe_detail, recipe_create, etc. remain unchanged) ...
+# Copy the rest of your original recipe_views.py file below this point.
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     comments = recipe.comments.select_related("author")

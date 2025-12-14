@@ -1,34 +1,33 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count
 from django.shortcuts import render
 from recipes.models import Recipe, RecipeRating, Category 
+from recipes.search_filters import filter_recipes # Ensure this import works
 import math 
 
 
 @login_required
 def dashboard(request):
     """
+
     Display the current user's dashboard.
 
+
+
     This view renders the dashboard page for the authenticated user.
+
     It ensures that only logged-in users can access the page. If a user
+
     is not authenticated, they are automatically redirected to the login
+
     page.
+
     """
+
 
     current_user = request.user
     sort = request.GET.get("sort", "newest")
-    query = request.GET.get("q", "").strip()
-    include_ids = [int(pk) for pk in request.GET.getlist("include") if pk.isdigit()]
-    exclude_ids = [int(pk) for pk in request.GET.getlist("exclude") if pk.isdigit()]
-    ordering_map = {
-        "newest": ("-created_at",),
-        "likes": ("-likes_total", "-created_at"),
-        "rating": ("-rating_avg", "-rating_total", "-created_at"),
-        "comments": ("-comment_total", "-created_at"),
-        "title": ("title",),
-    }
-
+    
     recipes_qs = (
         Recipe.objects.select_related("author")
         .prefetch_related("comments__author", "categories")
@@ -40,25 +39,31 @@ def dashboard(request):
         )
     )
 
-    if query:
-        recipes_qs = recipes_qs.filter(
-            Q(title__icontains=query)
-            | Q(description__icontains=query)
-            | Q(ingredients__icontains=query)
-        )
+    recipes_qs = filter_recipes(request, recipes_qs)
 
-    if include_ids:
-        recipes_qs = recipes_qs.filter(categories__id__in=include_ids)
+    top_rated_recipes = list(
+        recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:3]
+    )
+    latest_recipes = list(
+        recipes_qs.order_by("-created_at")[:3]
+    )
+    featured_recipes = list(
+        recipes_qs.order_by("-likes_total", "-created_at")[:3]
+    )
 
-    if exclude_ids:
-        recipes_qs = recipes_qs.exclude(categories__id__in=exclude_ids)
-
-    recipes_qs = recipes_qs.distinct()
+    ordering_map = {
+        "newest": ("-created_at",),
+        "likes": ("-likes_total", "-created_at"),
+        "rating": ("-rating_avg", "-rating_total", "-created_at"),
+        "comments": ("-comment_total", "-created_at"),
+        "title": ("title",),
+    }
+    
     recipes = list(recipes_qs.order_by(*ordering_map.get(sort, ("-created_at",))))
 
     recipe_ids = [recipe.id for recipe in recipes]
-
     user_ratings = {}
+    
     if recipe_ids:
         user_ratings = {
             rating.recipe_id: rating.rating 
@@ -71,18 +76,11 @@ def dashboard(request):
     for recipe in recipes: 
         recipe.user_rating_value = user_ratings.get(recipe.id)
 
-    top_rated_recipes = list(
-        recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:3]
-    )
-    latest_recipes = list(recipes_qs.order_by("-created_at")[:3])
-    featured_recipes = list(recipes_qs.order_by("-likes_total", "-created_at")[:3])
-
     categories = list(Category.objects.order_by("label"))
     column_size = max(1, math.ceil(len(categories) / 3))
     category_columns = [
         categories[i : i + column_size] for i in range(0, len(categories), column_size)
     ]
-
 
     return render(
         request,
@@ -92,11 +90,9 @@ def dashboard(request):
             "recipes": recipes,
             "star_range": range(1, 6),
             "active_sort": sort,
-            "query": query,
+            "query": request.GET.get("q", ""),
             "categories": categories,
             "category_columns": category_columns,
-            "selected_includes": include_ids,
-            "selected_excludes": exclude_ids,
             "top_rated_recipes": top_rated_recipes,
             "latest_recipes": latest_recipes,
             "featured_recipes": featured_recipes,
@@ -108,4 +104,3 @@ def dashboard(request):
             ),
         },
     )
-

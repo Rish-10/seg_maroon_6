@@ -1,0 +1,48 @@
+{% extends 'base_content.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'profile_page' profile_user.username %}" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i> Back to Profile
+                </a>
+                <h2 class="mb-0">{{ title }}</h2>
+            </div>
+
+            <div class="list-group shadow-sm">
+                {% for user in user_list %}
+                    <div class="list-group-item d-flex align-items-center justify-content-between p-3">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ user.gravatar }}" alt="{{ user.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                            <div>
+                                <h5 class="mb-0">
+                                    <a href="{% url 'profile_page' user.username %}" class="text-decoration-none text-dark">
+                                        {{ user.full_name|default:user.username }}
+                                    </a>
+                                </h5>
+                                <small class="text-muted">{{ user.username }}</small>
+                                {% if user.bio %}
+                                    <br><small class="text-muted">{{ user.bio|truncatechars:60 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'profile_page' user.username %}" class="btn btn-sm btn-outline-primary">
+                            View Profile
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="list-group-item text-center py-5 text-muted">
+                        <i class="bi bi-people fs-1 d-block mb-3"></i>
+                        {{ empty_message }}
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
