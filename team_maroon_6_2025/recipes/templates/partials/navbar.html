@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+<nav class="navbar navbar-expand-lg navbar-dark mb-3" style="background: #000 !important;">
   <div class="container">
     <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse"
@@ -83,53 +83,70 @@
 
       {% if user.is_authenticated %}
         <div class="collapse w-100 mt-3" id="navSearch">
-          <div class="row g-2">
-            <div class="col-12 col-lg-6">
-              <div class="text-light small mb-1">Include categories:</div>
-              <div class="d-flex flex-wrap gap-2">
-                {% for category in nav_categories %}
-                  <input type="checkbox"
-                         class="btn-check"
-                         form="nav-search-form"
-                         name="include"
-                         value="{{ category.id }}"
-                         id="nav-include-{{ category.id }}"
-                         {% if category.id in nav_selected_includes %}checked{% endif %}>
-                  <label class="btn btn-outline-primary btn-sm" for="nav-include-{{ category.id }}">
-                    {{ category.label }}
-                  </label>
-                {% endfor %}
-              </div>
-            </div>
+          <div class="card card-body bg-dark border-secondary">
+            <div class="row g-3">
+              
+              <div class="col-12 col-lg-4 border-end border-secondary">
+                <div class="text-light small mb-2 fw-bold text-uppercase">1. Pick a Meal</div>
+                <div class="d-flex flex-wrap gap-2">
+                  <input type="radio" class="btn-check" form="nav-search-form" 
+                        name="meal" value="" id="meal-any" 
+                        {% if not nav_selected_meal %}checked{% endif %}>
+                  <label class="btn btn-outline-secondary btn-sm" for="meal-any">Any</label>
 
-            <div class="col-12 col-lg-6">
-              <div class="text-light small mb-1">Exclude categories:</div>
-              <div class="d-flex flex-wrap gap-2">
-                {% for category in nav_categories %}
-                  <input type="checkbox"
-                         class="btn-check"
-                         form="nav-search-form"
-                         name="exclude"
-                         value="{{ category.id }}"
-                         id="nav-exclude-{{ category.id }}"
-                         {% if category.id in nav_selected_excludes %}checked{% endif %}>
-                  <label class="btn btn-outline-secondary btn-sm" for="nav-exclude-{{ category.id }}">
-                    {{ category.label }}
-                  </label>
-                {% endfor %}
+                  {% for category in nav_meal_categories %}
+                    <input type="radio" class="btn-check" form="nav-search-form" 
+                          name="meal" value="{{ category.id }}" id="meal-{{ category.id }}"
+                          {% if category.id == nav_selected_meal %}checked{% endif %}>
+                    <label class="btn btn-outline-primary btn-sm" for="meal-{{ category.id }}">
+                      {{ category.label }}
+                    </label>
+                  {% endfor %}
+                </div>
               </div>
-            </div>
 
-            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-              {% with url_name=request.resolver_match.url_name %}
-                {% if url_name == "dashboard" %}
-                  <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
-                {% elif url_name == "profile_page" or url_name == "profile_favourites" or url_name == "profile_likes" %}
-                  <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary">Clear</a>
-                {% else %}
-                  <a href="{% url 'recipe_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
-                {% endif %}
-              {% endwith %}
+              <div class="col-12 col-lg-4 border-end border-secondary">
+                <div class="text-light small mb-2 fw-bold text-uppercase">2. Dietary Specs (Include)</div>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for category in nav_dietary_categories %}
+                    <input type="checkbox" class="btn-check" form="nav-search-form" 
+                          name="dietary" value="{{ category.id }}" id="dietary-{{ category.id }}"
+                          {% if category.id in nav_selected_dietary %}checked{% endif %}>
+                    <label class="btn btn-outline-success btn-sm" for="dietary-{{ category.id }}">
+                      {{ category.label }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-4">
+                <div class="text-light small mb-2 fw-bold text-uppercase">3. Exclude</div>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for category in nav_all_categories %}
+                    <input type="checkbox" class="btn-check" form="nav-search-form" 
+                          name="exclude" value="{{ category.id }}" id="exclude-{{ category.id }}"
+                          {% if category.id in nav_selected_exclude %}checked{% endif %}>
+                    <label class="btn btn-outline-danger btn-sm" for="exclude-{{ category.id }}">
+                      {{ category.label }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="col-12 d-flex justify-content-end gap-2 mt-2 pt-2 border-top border-secondary">
+                {% with url_name=request.resolver_match.url_name %}
+                  {% if url_name == "dashboard" %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-light">Clear All</a>
+                  {% elif url_name == "profile_page" or url_name == "profile_favourites" or url_name == "profile_likes" %}
+                    <a href="{{ request.path }}" class="btn btn-sm btn-outline-light">Clear All</a>
+                  {% else %}
+                    <a href="{% url 'recipe_list' %}" class="btn btn-sm btn-outline-light">Clear All</a>
+                  {% endif %}
+                {% endwith %}
+                <button type="submit" form="nav-search-form" class="btn btn-sm btn-light text-primary fw-bold px-4">
+                  Apply Filters
+                </button>
+              </div>
             </div>
           </div>
         </div>

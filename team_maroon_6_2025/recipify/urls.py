@@ -24,22 +24,20 @@ from recipes.views import like_views
 from recipes.views import comment_views
 from recipes.views import inbox_view
 from recipes.views import shopping_list_views
+from recipes.views import profile_page_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('inbox/', inbox_view.inbox, name='inbox'),
+    path('inbox/delete/<int:pk>/', views.delete_notification, name='delete_notification'),
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('profile/<str:username>/', views.profile_page, kwargs={'section': 'posted_recipes'}, name='profile_page'),
-
-    # 2. Liked Section
     path('profile/<str:username>/likes/', views.profile_page, kwargs={'section': 'liked_recipes'}, name='profile_likes'),
-
-    # 3. Favourites Section
     path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
     path('follow/<str:username>/', views.follow_toggle, name='follow_toggle'),
     path('follow/accept/<str:username>/', views.accept_follow_request, name='accept_request'),
@@ -60,8 +58,7 @@ urlpatterns = [
     path("shopping-list/items/add/", shopping_list_views.shopping_list_add_item, name="shopping_list_add_item"),
     path("shopping-list/items/<int:item_id>/toggle/", shopping_list_views.shopping_list_toggle_item, name="shopping_list_toggle_item"),
     path("shopping-list/items/<int:item_id>/delete/", shopping_list_views.shopping_list_delete_item, name="shopping_list_delete_item"),
-
-
+    path('profile/<str:username>/<str:relation>/', profile_page_view.follow_list, name='follow_list'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

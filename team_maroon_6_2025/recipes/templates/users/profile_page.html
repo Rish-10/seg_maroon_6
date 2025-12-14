@@ -1,31 +1,62 @@
-{% extends 'base_content.html' %}
+{% extends "base_recipe_content.html" %}
 {% block content %}
-<div class="container">
+<div class="container user-profile-page">
   <div class="profile-header">
+    {% if request_received %}
+      <div class="alert alert-info d-flex justify-content-between align-items-center mb-4 shadow-sm">
+        <div>
+          <strong>Request Pending</strong>
+          <span class="d-block small text-muted">
+            {{ profile_user.username }} requested to follow you.
+          </span>
+        </div>
+        <div>
+          <a href="{% url 'accept_request' profile_user.username %}" class="btn btn-sm btn-primary me-1">
+            Accept
+          </a>
+          <a href="{% url 'decline_request' profile_user.username %}" class="btn btn-sm btn-outline-danger">
+            Decline
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
     <div class="profile-info">
       <img src="{{ profile_user.gravatar }}" alt="Avatar" class="avatar">
       <h1>{{ profile_user.full_name }}</h1>
       <p class="handle">{{ profile_user.username }}</p>
 
-      <p class="bio">{{ profile_user.bio }}</p>
+      {% if profile_user.bio %}
+        <div class="profile-bio text-muted mt-2 mb-3 text-break">
+          {{ profile_user.bio|linebreaksbr }}
+        </div>
+      {% endif %}
 
-      <div class="stats">
-        <span><strong>{{ profile_user.recipes.count }}</strong> Recipes</span>
-        <span><strong>{{ profile_user.follower_count }}</strong> Followers</span>
-        <span><strong>{{ profile_user.following_count }}</strong> Following</span>
+      <div class="stats d-flex gap-4">
+        <span>
+          <strong>{{ profile_user.recipes.count }}</strong> Recipes
+        </span>
+  
+        <a href="{% url 'follow_list' profile_user.username 'followers' %}" class="text-decoration-none text-dark">
+          <strong>{{ profile_user.follower_count }}</strong> Followers
+        </a>
+
+        <a href="{% url 'follow_list' profile_user.username 'following' %}" class="text-decoration-none text-dark">
+          <strong>{{ profile_user.following_count }}</strong> Following
+        </a>
       </div>
 
       {% if request.user.is_authenticated and request.user != profile_user %}
-        <form action="{% url 'follow_toggle' profile_user.username %}" method="POST">
+        <form action="{% url 'follow_toggle' profile_user.username %}" method="POST" class="mt-3">
           {% csrf_token %}
           {% if is_following %}
-            <button type="submit" class="btn btn-secondary">Unfollow</button>
+            <button type="submit" class="btn btn-secondary" style="min-width: 140px;">Unfollow</button>
+          {% elif request_sent %}
+            <button type="submit" class="btn btn-secondary" style="min-width: 140px;">Requested</button>
+          {% elif follow_request_required %}
+            <button type="submit" class="btn btn-primary" style="min-width: 140px;">Request to follow</button>
           {% else %}
-            {% if follow_request_required %}
-              <button type="submit" class="btn btn-primary">Request to follow</button>
-            {% else %}
-              <button type="submit" class="btn btn-primary">Follow</button>
-            {% endif %}
+            <button type="submit" class="btn btn-primary" style="min-width: 140px;">Follow</button>
           {% endif %}
         </form>
       {% endif %}
@@ -37,8 +68,8 @@
   <div class="row mt-4">
     <div class="col-12 mt-3">
       {% if follow_request_required %}
-        <div class="alert alert-light text-center">
-          <p>Only followers can view {{ profile_user.username }}'s recipes.</p>
+        <div class="alert alert-light text-center d-flex flex-column justify-content-center" style="min-height: 60px;">
+          <p class="mb-0">Only followers can view {{ profile_user.username }}'s recipes.</p>
         </div>
       {% else %}
         <ul class="nav nav-tabs mb-3">
@@ -61,6 +92,15 @@
                   Likes
               </a>
             </li>
+            {% if request.user == profile_user %}
+              <li class="nav-item">
+                <a class="nav-link {% if current_section == 'shopping_list' %}active{% endif %}"
+                  href="{% url 'profile_shopping_list' profile_user.username %}">
+                  Shopping List
+                </a>
+              </li>
+            {% endif %}
+
           {% endif %}
         </ul>
         {% if user_recipes %}
@@ -72,20 +112,31 @@
             {% include "partials/recipe_rows.html" with recipes=user_recipes %}
           {% endif %}
         {% else %}
-          <div class="alert alert-light text-center">
+          <div class="alert alert-light text-center d-flex flex-column justify-content-center" style="min-height: 60px;">
             {% if current_section == 'posted_recipes' %}
               {% if request.user == profile_user %}
-                <p>You haven't posted any recipes yet.</p>
+                <p class="mb-2">You haven't posted any recipes yet.</p>
                 <a href="{% url 'recipe_create' %}" class="btn btn-primary btn-sm">Create One Now</a>
               {% else %}
-                <p>This user hasn't posted any recipes yet.</p>
+                <p class="mb-0">This user hasn't posted any recipes yet.</p>
               {% endif %}
             {% elif current_section == 'favourite_recipes' %}
-              <p>This user hasn't favourited any recipes yet.</p>
+              {% if request.user == profile_user %}
+                <p class="mb-0">You haven't favourited any recipes yet.</p>
+              {% else %}
+                <p>This user hasn't favourited any recipes yet.</p>
+              {% endif %}
             {% elif current_section == 'liked_recipes' %}
-              <p>This user hasn't liked any recipes yet.</p>
+              {% if request.user == profile_user %}
+                <p class="mb-0">You haven't liked any recipes yet.</p>
+              {% else %}
+                <p class="mb-0">This user hasn't liked any recipes yet.</p>
+              {% endif %}
             {% endif %}
           </div>
+        {% endif %}
+        {% if current_section == 'shopping_list' %}
+          {% include "users/shopping_list.html" %}
         {% endif %}
       {% endif %}
     </div>
