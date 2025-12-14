@@ -6,7 +6,9 @@ from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from django.db.models import Avg, Count
+from django.db import models 
+from django.db.models import Avg, Count, Q
+from django.core.paginator import Paginator
 
 from recipes.models import Category, Recipe, RecipeImage, RecipeRating
 from recipes.forms import RecipeForm, CommentForm, RecipeImageForm, RecipeRatingForm
@@ -60,7 +62,24 @@ def recipe_list(request):
             following_qs = recipes_qs.filter(author_id__in=following_ids)
             following_recipes = list(following_qs.order_by(*ordering))
 
-    # 4. Handle User Ratings
+    recipes_qs = recipes_qs.distinct()
+    ordering = ordering_map.get(sort, ("-created_at",))
+
+    paginator = Paginator(recipes_qs.order_by(*ordering), 10)
+    page_number = request.GET.get("page") or 1
+    feed_recipes = paginator.get_page(page_number)
+    following_recipes = []
+
+    if request.user.is_authenticated:
+        following_ids = list(
+            request.user.following.values_list("id", flat=True)
+        )
+        if following_ids:
+            following_recipes = list(
+                recipes_qs.filter(author_id__in=following_ids)
+                .order_by(*ordering)
+            )
+
     user_ratings = {}
     if request.user.is_authenticated:
         recipe_ids = {r.id for r in chain(feed_recipes, following_recipes)}

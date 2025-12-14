@@ -62,6 +62,8 @@ def dashboard(request):
     recipes = list(recipes_qs.order_by(*ordering_map.get(sort, ("-created_at",))))
 
     recipe_ids = [recipe.id for recipe in recipes]
+
+    recipe_ids = [recipe.id for recipe in recipes]
     user_ratings = {}
     
     if recipe_ids:
@@ -75,6 +77,12 @@ def dashboard(request):
 
     for recipe in recipes: 
         recipe.user_rating_value = user_ratings.get(recipe.id)
+
+    top_rated_recipes = list(
+        recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:3]
+    )
+    latest_recipes = list(recipes_qs.order_by("-created_at")[:3])
+    featured_recipes = list(recipes_qs.order_by("-likes_total", "-created_at")[:3])
 
     categories = list(Category.objects.order_by("label"))
     column_size = max(1, math.ceil(len(categories) / 3))
@@ -90,9 +98,11 @@ def dashboard(request):
             "recipes": recipes,
             "star_range": range(1, 6),
             "active_sort": sort,
-            "query": request.GET.get("q", ""),
+            "query": query,
             "categories": categories,
             "category_columns": category_columns,
+            "selected_includes": include_ids,
+            "selected_excludes": exclude_ids,
             "top_rated_recipes": top_rated_recipes,
             "latest_recipes": latest_recipes,
             "featured_recipes": featured_recipes,
