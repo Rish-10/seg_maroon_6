@@ -26,6 +26,23 @@
       <h1>{{ profile_user.full_name }}</h1>
       <p class="handle">{{ profile_user.username }}</p>
 
+      {% if request.user == profile_user %}
+        <div class="stats d-flex gap-4">
+          <div class="mb-3">
+            <a href="{% url 'profile' %}" class="btn btn-sm btn-outline-primary">
+              Edit Profile
+            </a>
+          </div>
+
+          <div class="mb-3">
+            <a href="{% url 'password' %}" class="btn btn-sm btn-outline-primary">
+              Change Password
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+
       {% if profile_user.bio %}
         <div class="profile-bio text-muted mt-2 mb-3 text-break">
           {{ profile_user.bio|linebreaksbr }}
@@ -119,12 +136,6 @@
                 <p class="mb-0">You haven't favourited any recipes yet.</p>
               {% else %}
                 <p>This user hasn't favourited any recipes yet.</p>
-              {% endif %}
-            {% elif current_section == 'liked_recipes' %}
-              {% if request.user == profile_user %}
-                <p class="mb-0">You haven't liked any recipes yet.</p>
-              {% else %}
-                <p class="mb-0">This user hasn't liked any recipes yet.</p>
               {% endif %}
             {% endif %}
           </div>
