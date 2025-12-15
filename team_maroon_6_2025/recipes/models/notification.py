@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.conf import settings
 
+# Model representing a user notification (follow, comment, favourite, etc.)
 class Notification(models.Model):
     TYPES = [
         ('favourite', 'New Favourite'),
@@ -23,6 +24,6 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-
+    # Return a readable description of the notification
     def __str__(self):
         return f"{self.sender} -> {self.recipient} ({self.notification_type})"

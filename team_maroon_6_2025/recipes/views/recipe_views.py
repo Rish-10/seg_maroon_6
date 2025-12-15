@@ -21,7 +21,7 @@ RecipeImageFormSet = inlineformset_factory(
     extra=3,
     can_delete=True,
 )
-
+# Display the recipe list with filtering, sorting, pagination, and following feed
 def recipe_list(request):
     sort = request.GET.get("sort", "newest")
     ordering_map = {
@@ -104,7 +104,7 @@ def recipe_list(request):
             "query": request.GET.get("q", ""),
         },
     )
-
+# Display a single recipe with comments and rating information
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     comments = recipe.comments.select_related("author")
@@ -134,7 +134,7 @@ def recipe_detail(request, pk):
 
     return render(request, "recipes/recipe_detail.html", context)
 
-
+# Create a new recipe with optional images
 def recipe_create(request):
     if request.method == "POST":
         form = RecipeForm(request.POST)
@@ -161,7 +161,7 @@ def recipe_create(request):
         },
     )
 
-
+# Edit an existing recipe owned by the current user
 @login_required
 def recipe_edit(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
@@ -191,7 +191,7 @@ def recipe_edit(request, pk):
         },
     )
 
-
+# Save or update a user's rating for a recipe
 @login_required
 @require_POST
 def rate_recipe(request, pk):

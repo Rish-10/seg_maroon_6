@@ -79,6 +79,7 @@ def dashboard(request):
         },
     )
 
+# Build and return a filtered queryset of recipes based on search parameters
 def search_recipes(request):
     recipes_qs = (
         Recipe.objects.select_related("author")

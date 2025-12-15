@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.contrib import admin
 from recipes.models import ShoppingListItem
 
-# Register your models here.
-
+# Configure how shopping list items appear in the Django admin
 @admin.register(ShoppingListItem)
 class ShoppingListItemAdmin(admin.ModelAdmin):
     list_display = ("name", "user", "source_recipe", "is_checked")

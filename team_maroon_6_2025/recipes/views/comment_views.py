@@ -6,7 +6,7 @@ from django.urls import reverse
 from recipes.forms import CommentForm
 from recipes.models import Comment, Recipe, Notification
 
-
+# Add a new comment to a recipe
 @login_required
 def add_comment(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
@@ -28,7 +28,7 @@ def add_comment(request, pk):
 
     return redirect(request.POST.get("next") or reverse("recipe_detail", args=[pk]))
 
-
+# Edit an existing comment owned by the current user
 @login_required
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id, author=request.user)
@@ -45,7 +45,7 @@ def edit_comment(request, comment_id):
 
     return redirect(request.POST.get("next") or reverse("recipe_detail", args=[comment.recipe_id]))
 
-
+# Like or unlike a comment
 @login_required
 def toggle_comment_like(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)

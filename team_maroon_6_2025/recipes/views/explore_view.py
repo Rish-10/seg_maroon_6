@@ -2,9 +2,8 @@ from django.db.models import Avg, Count
 from django.shortcuts import render
 from recipes.models import Recipe, Category
 
-
+# Display the explore page with trending, new, and personalised recipes
 def explore(request):
-    """Explore page showing trending, new, and for-you recipes."""
     base_qs = (
         Recipe.objects.select_related("author")
         .prefetch_related("categories", "images")

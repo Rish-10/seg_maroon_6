@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 
+# Model representing a pending follow request between two users
 class FollowRequest(models.Model):
     follow_requester = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_sent', on_delete=models.CASCADE)
     requested_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_received', on_delete=models.CASCADE)

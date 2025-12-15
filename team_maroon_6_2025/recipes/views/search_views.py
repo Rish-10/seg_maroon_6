@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-
+# Redirect search queries to the appropriate page based on context
 def search_redirect(request):
     query = request.GET.get("q", "").strip()
     return_to = request.GET.get('return_to', '/')

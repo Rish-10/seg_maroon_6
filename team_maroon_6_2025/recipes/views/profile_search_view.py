@@ -4,7 +4,7 @@ from django.urls import reverse
 from recipes.models import Recipe, User
 from recipes.search_filters import filter_users
 
-
+# Search for users by username and redirect if only one result is found
 def profile_search(request):
     users = filter_users(request)
     if users.count() == 1:

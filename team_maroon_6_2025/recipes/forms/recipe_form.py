@@ -1,6 +1,7 @@
 from django import forms
 from recipes.models.recipe import Recipe, Category
 
+# Form for creating or editing a recipe
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
@@ -9,7 +10,7 @@ class RecipeForm(forms.ModelForm):
         # Add Bootstrap styles and English placeholders
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control form-control-lg',  # Large input box
+                'class': 'form-control form-control-lg',  
                 'placeholder': 'Enter a catchy title (e.g., Golden Fried Rice)'
             }),
             'description': forms.Textarea(attrs={
@@ -29,7 +30,7 @@ class RecipeForm(forms.ModelForm):
             }),
             'categories': forms.CheckboxSelectMultiple()
         }
-
+    # Initialise the form and configure the category field
     def __init__(self, *args, **kwargs): 
         super().__init__(*args, **kwargs)
         self.fields['categories'].queryset = Category.objects.order_by('label')

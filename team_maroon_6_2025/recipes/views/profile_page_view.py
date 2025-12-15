@@ -9,7 +9,7 @@ from recipes.forms import ShoppingListItemForm
 from recipes.models import FollowRequest, User
 from recipes.models.notification import Notification
 from recipes.search_filters import filter_recipes
-
+# Display a user's profile page with recipes, follow status, and privacy handling
 def profile_page(request, username, section="posted_recipes"):
     profile_user = get_object_or_404(User, username=username)
 
@@ -83,7 +83,7 @@ def profile_page(request, username, section="posted_recipes"):
     }
     return render(request, "users/profile_page.html", context)
 
-
+# Follow or unfollow a user, or send/cancel a follow request
 @login_required
 def follow_toggle(request, username):
     user_to_follow = get_object_or_404(User, username=username)
@@ -131,7 +131,7 @@ def follow_toggle(request, username):
 
     return redirect("profile_page", username=username)
 
-
+# Accept a pending follow request
 @login_required
 def accept_follow_request(request, username):
     user_to_follow = request.user
@@ -144,7 +144,7 @@ def accept_follow_request(request, username):
     follow_request.delete()
     return redirect("profile_page", username=username)
 
-
+# Decline a pending follow request
 @login_required
 def decline_follow_request(request, username):
     user_to_follow = request.user
@@ -156,10 +156,9 @@ def decline_follow_request(request, username):
     follow_request.delete()
     return redirect("profile_page", username=username)
 
+# Display a list of followers or followed users
 def follow_list(request, username, relation):
-    """
-    Display a list of users who are either followers or being followed by 'username'.
-    """
+    
     profile_user = get_object_or_404(User, username=username)
     current_user = request.user
     

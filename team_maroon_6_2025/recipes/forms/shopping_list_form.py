@@ -1,7 +1,7 @@
 from django import forms
 from recipes.models import ShoppingListItem
 
-
+# Form for adding or editing an item in the shopping list
 class ShoppingListItemForm(forms.ModelForm):
     class Meta:
         model = ShoppingListItem

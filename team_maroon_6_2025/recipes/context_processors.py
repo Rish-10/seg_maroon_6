@@ -1,5 +1,6 @@
 from recipes.models import Category
 
+# Provided navbar search categories and current filter selections to all templates
 def navbar_search(request):
     meal_keys = ['breakfast', 'lunch', 'dinner', 'dessert']
     all_cats = Category.objects.order_by("label")

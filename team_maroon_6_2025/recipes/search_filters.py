@@ -2,6 +2,7 @@ from django.db.models import Q
 
 from recipes.models import User
 
+# Filter a recipe queryset based on search text and category filters
 def filter_recipes(request, queryset):
    
     query = request.GET.get("q", "").strip()
@@ -25,6 +26,7 @@ def filter_recipes(request, queryset):
 
     return queryset.distinct()
 
+# Filter users based on a username search query
 def filter_users(request):
     query = request.GET.get('q', '').strip()
     username = query[1:]

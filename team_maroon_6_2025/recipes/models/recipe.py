@@ -1,6 +1,7 @@
 from django.conf import settings 
 from django.db import models
 
+# Model representing a recipe category
 class Category(models.Model): 
     key = models.CharField(max_length = 50, unique = True)
     label = models.CharField(max_length = 100)
@@ -8,10 +9,11 @@ class Category(models.Model):
     class Meta: 
         ordering = ["label"]
 
-    
+    # Return the category label
     def __str__(self): 
         return self.label
 
+# Model representing a recipe created by a user
 class Recipe(models.Model): 
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -26,9 +28,10 @@ class Recipe(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Return the recipe title
     def __str__(self): 
         return self.title
-    # Define the choices for the category dropdown
+    
     CATEGORY_CHOICES = [
         ('Breakfast', 'Breakfast'),
         ('Lunch', 'Lunch'),
@@ -43,22 +46,23 @@ class Recipe(models.Model):
         blank=True,
     )
 
-
+    # Return the total number of likes
     @property
     def likes_count(self):
-        """Returns the number of likes for the recipe."""
+        
         return self.likes.count()
-    
+    # Return the total number of ratings
     @property
     def rating_count(self): 
-        return self.ratings.count() 
-    
+        return self.ratings.count()
+     
+    # Return the average rating value
     @property 
     def average_rating(self): 
         avg = self.ratings.aggregate(avg=models.Avg('rating'))['avg']
         return avg or 0 
     
-    
+# Model representing an image attached to a recipe    
 class RecipeImage(models.Model):
     recipe = models.ForeignKey(
         Recipe,
@@ -73,10 +77,11 @@ class RecipeImage(models.Model):
     class Meta:
         ordering = ["position", "id"]
 
+    # Returns a readable description of the image
     def __str__(self):
         return f"Image for {self.recipe.title}"
 
-    
+# Model representing a comment left on a recipe    
 class Comment(models.Model):
     recipe = models.ForeignKey(
         Recipe,
@@ -99,15 +104,16 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-
+    # Return a readable description of the comment
     def __str__(self):
         return f"Comment by {self.author} on {self.recipe}"
 
+    # Return the number of likes on the comment
     @property
     def likes_count(self):
         return self.likes.count()
 
-
+# Model representing a user's rating for a recipe
 class RecipeRating(models.Model): 
     recipe_rating_choices = [(1, "1"), (2, "2"), (3, "3"), (4, "4"), (5, "5")]
 
@@ -133,7 +139,7 @@ class RecipeRating(models.Model):
                 name = 'unique_recipe_rating_per_user'
             )
         ]
-    
+    # Return a readable description of the rating
     def __str__(self):
         return f'{self.recipe.title} rated {self.rating} by {self.user}'
     

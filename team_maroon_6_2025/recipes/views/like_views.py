@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from recipes.models import Recipe
 
-
+# Like or unlike a recipe
 @login_required
 def toggle_like(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
