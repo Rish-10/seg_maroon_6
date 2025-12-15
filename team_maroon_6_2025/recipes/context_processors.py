@@ -1,4 +1,3 @@
-# recipes/context_processors.py
 from recipes.models import Category
 
 def navbar_search(request):
@@ -15,7 +14,7 @@ def navbar_search(request):
     return {
         "nav_meal_categories": meal_cats,
         "nav_dietary_categories": dietary_cats,
-        "nav_all_categories": all_cats, # Needed for the exclusion list
+        "nav_all_categories": all_cats, 
         
         "nav_selected_meal": int(current_meal) if current_meal.isdigit() else None,
         "nav_selected_dietary": current_dietary,

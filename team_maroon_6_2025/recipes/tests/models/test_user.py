@@ -1,10 +1,8 @@
-"""Unit tests for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from recipes.models import User
 
 class UserModelTestCase(TestCase):
-    """Unit tests for the User model."""
 
     fixtures = [
         'recipes/tests/fixtures/default_user.json',

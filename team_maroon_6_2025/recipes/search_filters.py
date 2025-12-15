@@ -1,4 +1,3 @@
-# recipes/search_filters.py
 from django.db.models import Q
 
 def filter_recipes(request, queryset):

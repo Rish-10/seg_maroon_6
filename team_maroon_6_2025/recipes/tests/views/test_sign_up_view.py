@@ -1,4 +1,3 @@
-"""Tests of the sign up view."""
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
@@ -7,7 +6,6 @@ from recipes.models import User
 from recipes.tests.helpers import LogInTester
 
 class SignUpViewTestCase(TestCase, LogInTester):
-    """Tests of the sign up view."""
 
     fixtures = ['recipes/tests/fixtures/default_user.json']
 
