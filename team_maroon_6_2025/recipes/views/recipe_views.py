@@ -32,7 +32,6 @@ def recipe_list(request):
         "title": ("title",),
     }
 
-    # 1. Base Query
     recipes_qs = (
         Recipe.objects.select_related("author")
         .prefetch_related("comments__author", "categories")
@@ -44,11 +43,8 @@ def recipe_list(request):
         )
     )
 
-    # 2. APPLY FILTERING
-    # Replaces all the manual 'if query', 'if include_ids' logic
     recipes_qs = filter_recipes(request, recipes_qs)
 
-    # 3. Ordering and List Generation
     ordering = ordering_map.get(sort, ("-created_at",))
     feed_recipes = list(recipes_qs.order_by(*ordering))
     
@@ -58,7 +54,6 @@ def recipe_list(request):
             request.user.following.values_list("id", flat=True)
         )
         if following_ids:
-            # We also apply the filters to the "Following" tab
             following_qs = recipes_qs.filter(author_id__in=following_ids)
             following_recipes = list(following_qs.order_by(*ordering))
 
@@ -107,13 +102,9 @@ def recipe_list(request):
             "star_range": range(1, 6),
             "active_sort": sort,
             "query": request.GET.get("q", ""),
-            # We no longer strictly need selected_includes/excludes here 
-            # because the Context Processor handles the Navbar state.
         },
     )
 
-# ... (The rest of your functions: recipe_detail, recipe_create, etc. remain unchanged) ...
-# Copy the rest of your original recipe_views.py file below this point.
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     comments = recipe.comments.select_related("author")

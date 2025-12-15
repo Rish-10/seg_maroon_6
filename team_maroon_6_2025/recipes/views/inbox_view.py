@@ -38,5 +38,4 @@ def delete_notification(request, pk):
         notification.delete()
 
     # Redirect back to inbox.
-    # We could theoretically grab the 'filter' param to keep them on the same tab.
     return redirect('inbox')
