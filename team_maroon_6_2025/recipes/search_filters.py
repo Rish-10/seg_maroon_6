@@ -1,14 +1,15 @@
 from django.db.models import Q
 
+from recipes.models import User
+
 def filter_recipes(request, queryset):
    
     query = request.GET.get("q", "").strip()
-    if query:
-        queryset = queryset.filter(
-            Q(title__icontains=query)
-            | Q(description__icontains=query)
-            | Q(ingredients__icontains=query)
-        )
+    queryset = queryset.filter(
+        Q(title__icontains=query)
+        | Q(description__icontains=query)
+        | Q(ingredients__icontains=query)
+    )
 
     meal_id = request.GET.get("meal")
     if meal_id and meal_id.isdigit():
@@ -23,3 +24,10 @@ def filter_recipes(request, queryset):
         queryset = queryset.exclude(categories__id__in=exclude_ids)
 
     return queryset.distinct()
+
+def filter_users(request):
+    query = request.GET.get('q', '').strip()
+    username = query[1:]
+
+    users = User.objects.filter(username__icontains=username)
+    return users.distinct()

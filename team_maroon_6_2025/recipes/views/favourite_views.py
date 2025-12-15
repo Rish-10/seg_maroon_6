@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -20,7 +21,8 @@ def toggle_favourite(request, pk):
         Notification.objects.filter(
             recipient=recipe.author,
             sender=request.user,
-            target_object=recipe,
+            content_type=ContentType.objects.get_for_model(Recipe),
+            object_id=recipe.pk,
             notification_type='favourite'
         ).delete()
     else:

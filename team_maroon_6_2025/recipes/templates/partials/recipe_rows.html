@@ -56,16 +56,16 @@
 
           <!-- Action Buttons -->
           <div class="d-flex gap-2">
-            <form method="post" action="{% url 'recipe_favourite_toggle' recipe.pk %}" class="flex-fill">
+            <form method="post" action="{% url 'recipe_favourite_toggle' recipe.pk %}" class="flex-fill .fav-btn">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.path }}">
               {% if user.is_authenticated and recipe in user.favourites.all %}
                 <button class="btn btn-sm btn-outline-danger w-100" type="submit">
-                  <i class="bi bi-heart-fill"></i> Favorited
+                  <i class="bi bi-heart-fill"></i> Favourited
                 </button>
               {% else %}
                 <button class="btn btn-sm btn-outline-primary w-100" type="submit">
-                  <i class="bi bi-heart"></i> Favorite
+                  <i class="bi bi-heart"></i> Favourite
                 </button>
               {% endif %}
             </form>

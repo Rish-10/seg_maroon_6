@@ -34,15 +34,7 @@
 
             <li class="nav-item d-flex align-items-center ms-3 flex-grow-1 flex-md-grow-0">
               <form id="nav-search-form"
-                    {% with url_name=request.resolver_match.url_name %}
-                      {% if url_name == "dashboard" %}
-                        action="{% url 'dashboard' %}"
-                      {% elif url_name == "profile_page" or url_name == "profile_favourites" or url_name == "profile_likes" %}
-                        action="{{ request.path }}"
-                      {% else %}
-                        action="{% url 'recipe_list' %}"
-                      {% endif %}
-                    {% endwith %}
+                    action="{% url 'search' %}"
                     method="GET"
                     class="d-flex align-items-center gap-2 flex-wrap flex-md-nowrap">
 
@@ -50,7 +42,9 @@
                        name="q"
                        value="{{ nav_q }}"
                        class="form-control form-control-sm w-100 w-md-auto"
-                       placeholder="Search recipes...">
+                       placeholder="Search...">
+
+                <input type="hidden" name="return_to" value="{{ request.path }}">
 
                 <button class="btn btn-outline-light btn-sm"
                         type="button"

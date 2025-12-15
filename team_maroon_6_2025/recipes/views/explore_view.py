@@ -1,6 +1,6 @@
 from django.db.models import Avg, Count
 from django.shortcuts import render
-from recipes.models import Recipe, RecipeView, Category
+from recipes.models import Recipe, Category
 
 
 def explore(request):
