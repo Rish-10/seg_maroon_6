@@ -8,7 +8,7 @@ from recipes.models import FollowRequest, User
 from recipes.forms import ShoppingListItemForm
 from recipes.models import FollowRequest, User
 from recipes.models.notification import Notification
-from recipes.search_filters import filter_recipes  # <--- Import the helper
+from recipes.search_filters import filter_recipes
 
 def profile_page(request, username, section="posted_recipes"):
     profile_user = get_object_or_404(User, username=username)
@@ -53,25 +53,12 @@ def profile_page(request, username, section="posted_recipes"):
     if not can_view_interests:
         section = "posted_recipes"
 
-    # 1. Select the Base Queryset depending on the tab
     if section == "favourite_recipes":
         user_recipes = profile_user.favourites.prefetch_related(*base_prefetch).order_by("-created_at")
     else:
-        # Default to posted recipes
         user_recipes = profile_user.recipes.prefetch_related(*base_prefetch).order_by("-created_at")
 
-    # 2. APPLY FILTERS (The Fix)
-    # Replaces the old manual q/include/exclude logic
     user_recipes = filter_recipes(request, user_recipes)
-
-    # 3. Handle Shopping List (if active)
-    shopping_list_items = None
-    shopping_form = ShoppingListItemForm()
-    if section == "shopping_list":
-        if is_me:
-            shopping_list_items = profile_user.shopping_list_items.order_by("is_checked", "name")
-        else:
-            section = "posted_recipes"
 
     shopping_list_items = None
     shopping_form = ShoppingListItemForm()

@@ -1,6 +1,6 @@
 from django.db.models import Avg, Count
 from django.shortcuts import render
-from recipes.models import Recipe, RecipeView, Category
+from recipes.models import Recipe, Category
 
 
 def explore(request):
@@ -32,7 +32,7 @@ def explore(request):
                 recipes__in=Recipe.objects.filter(views__user=request.user)
             ).values_list("id", flat=True)
         )
-        top_category_ids = list(dict.fromkeys(top_category_ids))[:3]  # dedupe, take up to 3
+        top_category_ids = list(dict.fromkeys(top_category_ids))[:3]  
 
         if top_category_ids:
             for_you = list(

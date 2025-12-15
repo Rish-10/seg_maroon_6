@@ -36,12 +36,6 @@ class Recipe(models.Model):
         ('Dessert', 'Dessert'),
     ]
 
-    # Add the category field to the database - changed to many to many option
-    # category = models.CharField(
-    #     max_length=50,
-    #     choices=CATEGORY_CHOICES,
-    #     default='Dinner'  
-    # )
 
     categories = models.ManyToManyField(
         Category,

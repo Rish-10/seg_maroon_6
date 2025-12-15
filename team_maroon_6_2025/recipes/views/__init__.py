@@ -10,3 +10,4 @@ from .search_views import*
 from .profile_page_view import *
 from .shopping_list_views import *
 from .inbox_view import *
+from .profile_search_view import *
