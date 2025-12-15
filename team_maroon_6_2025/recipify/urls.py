@@ -19,11 +19,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from recipes import views
-from recipes.views import favourite_views
-from recipes.views import like_views
+from recipes.views import favourite_view
+from recipes.views import like_view
 from recipes.views import comment_views
 from recipes.views import inbox_view
-from recipes.views import shopping_list_views
+from recipes.views import shopping_list_view
 from recipes.views import profile_page_view
 
 urlpatterns = [
@@ -47,8 +47,8 @@ urlpatterns = [
     path('recipes/', views.recipe_list, name='recipe_list'),
     path('recipes/create/', views.recipe_create, name='recipe_create'),
     path('recipes/<int:pk>', views.recipe_detail, name='recipe_detail'),
-    path('recipes/<int:pk>/favourite/', favourite_views.toggle_favourite, name='recipe_favourite_toggle'),
-    path("recipes/<int:pk>/like/", like_views.toggle_like, name="recipe_like_toggle"),
+    path('recipes/<int:pk>/favourite/', favourite_view.toggle_favourite, name='recipe_favourite_toggle'),
+    path("recipes/<int:pk>/like/", like_view.toggle_like, name="recipe_like_toggle"),
     path("recipes/<int:pk>/comments/add/", comment_views.add_comment, name="comment_add"),
     path('recipes/<int:pk>/edit/', views.recipe_edit, name='recipe_edit'),
     path('recipes/<int:pk>/delete/', views.recipe_delete, name='recipe_delete'),
@@ -56,10 +56,10 @@ urlpatterns = [
     path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
     path("recipes/<int:pk>/rate/", views.rate_recipe, name="recipe_rate"),
     path("profile/<str:username>/shopping-list/", views.profile_page,kwargs={"section": "shopping_list"}, name="profile_shopping_list"),
-    path("recipes/<int:pk>/shopping-list/add/", shopping_list_views.shopping_list_add_recipe, name="shopping_list_add_recipe"),
-    path("shopping-list/items/add/", shopping_list_views.shopping_list_add_item, name="shopping_list_add_item"),
-    path("shopping-list/items/<int:item_id>/toggle/", shopping_list_views.shopping_list_toggle_item, name="shopping_list_toggle_item"),
-    path("shopping-list/items/<int:item_id>/delete/", shopping_list_views.shopping_list_delete_item, name="shopping_list_delete_item"),
+    path("recipes/<int:pk>/shopping-list/add/", shopping_list_view.shopping_list_add_recipe, name="shopping_list_add_recipe"),
+    path("shopping-list/items/add/", shopping_list_view.shopping_list_add_item, name="shopping_list_add_item"),
+    path("shopping-list/items/<int:item_id>/toggle/", shopping_list_view.shopping_list_toggle_item, name="shopping_list_toggle_item"),
+    path("shopping-list/items/<int:item_id>/delete/", shopping_list_view.shopping_list_delete_item, name="shopping_list_delete_item"),
     path('profile/<str:username>/<str:relation>/', profile_page_view.follow_list, name='follow_list')
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

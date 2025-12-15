@@ -7,13 +7,10 @@ are left untouched—if a create fails (e.g., due to duplicates), the error
 is swallowed and generation continues.
 """
 
-
-
 from faker import Faker
 from random import randint, random
 from django.core.management.base import BaseCommand, CommandError
 from recipes.models import User
-
 
 user_fixtures = [
     {

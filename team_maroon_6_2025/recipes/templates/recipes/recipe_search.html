@@ -2,167 +2,169 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Search Results</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Search Results</h1>
         
-        <form action="{% url 'recipe_search' %}" method="GET" class="row g-3 align-items-center w-100" style="max-width: 1000px;">
-            <div class="col-12 col-lg-4">
-                <label class="form-label small text-muted mb-1">Keywords</label>
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ query }}"
-                    class="form-control form-control-sm"
-                    placeholder="Search recipes..."
-                >
-            </div>
+    <form action="{% url 'recipe_search' %}" method="GET" class="row g-3 align-items-center w-100" style="max-width: 1000px;">
+      <div class="col-12 col-lg-4">
+        <label class="form-label small text-muted mb-1">Keywords</label>
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="form-control form-control-sm"
+            placeholder="Search recipes..."
+        >
+      </div>
 
-            <div class="col-12 col-lg-4">
-                <label class="form-label small text-muted mb-1">Include any of these categories</label>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for category in categories %}
-                        <input
-                            type="checkbox"
-                            class="btn-check"
-                            name="include"
-                            value="{{ category.id }}"
-                            id="include-{{ category.id }}"
-                            {% if category.id in selected_includes %}checked{% endif %}
-                        >
-                        <label class="btn btn-outline-primary btn-sm" for="include-{{ category.id }}">
-                            {{ category.label }}
-                        </label>
-                    {% endfor %}
-                    {% if not categories %}
-                        <span class="text-muted small">No categories yet.</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="col-12 col-lg-4">
-                <label class="form-label small text-muted mb-1">Exclude these categories</label>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for category in categories %}
-                        <input
-                            type="checkbox"
-                            class="btn-check"
-                            name="exclude"
-                            value="{{ category.id }}"
-                            id="exclude-{{ category.id }}"
-                            {% if category.id in selected_excludes %}checked{% endif %}
-                        >
-                        <label class="btn btn-outline-secondary btn-sm" for="exclude-{{ category.id }}">
-                            {{ category.label }}
-                        </label>
-                    {% endfor %}
-                    {% if not categories %}
-                        <span class="text-muted small">No categories yet.</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="bi bi-search"></i> Search
-                </button>
-                <a href="{% url 'recipe_search' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
-            </div>
-        </form>
-
-        <a href="{% url 'recipe_create' %}" class="btn btn-primary ms-2">Create Recipe</a>
-    </div>
-
-    {% if has_searched %}
-        <p class="text-muted mb-4">
-            Showing results for: 
-            {% if query %}
-                <strong>"{{ query }}"</strong>
-            {% else %}
-                <strong>Any text</strong>
-            {% endif %}
-            {% if selected_includes %}
-                including any of:
-                {% for cid in selected_includes %}
-                    {% for c in categories %}
-                        {% if c.id == cid %}
-                            <span class="badge bg-secondary ms-1">{{ c.label }}</span>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-            {% if selected_excludes %}
-                excluding:
-                {% for cid in selected_excludes %}
-                    {% for c in categories %}
-                        {% if c.id == cid %}
-                            <span class="badge bg-light text-muted border ms-1">{{ c.label }}</span>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-        </p>
-    {% endif %}
-
-    {% if recipes %}
-        <div class="row">
-            {% for recipe in recipes %}
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">
-                                    <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none text-dark">
-                                        {{ recipe.title }}
-                                    </a>
-                                </h5>
-                                <div class="d-flex flex-wrap gap-1">
-                                    {% for category in recipe.categories.all %}
-                                        <span class="badge bg-secondary" style="font-size: 0.75em;">{{ category.label }}</span>
-                                    {% empty %}
-                                        <span class="badge bg-light text-muted" style="font-size: 0.75em;">No category</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <p class="card-text text-muted small">
-                                <i class="bi bi-person"></i> <a href="{% url 'profile_page' recipe.author.username %}" class="text-decoration-none">{{ recipe.author.username }}</a>
-                                <span class="mx-1">•</span>
-                                <i class="bi bi-clock"></i> {{ recipe.created_at|date:"d M Y" }}
-                            </p>
-                            <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary">View Recipe</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+      <div class="col-12 col-lg-4">
+        <label class="form-label small text-muted mb-1">Include any of these categories</label>
+        <div class="d-flex flex-wrap gap-2">
+          {% for category in categories %}
+            <input
+                type="checkbox"
+                class="btn-check"
+                name="include"
+                value="{{ category.id }}"
+                id="include-{{ category.id }}"
+                {% if category.id in selected_includes %}checked{% endif %}
+            >
+            <label class="btn btn-outline-primary btn-sm" for="include-{{ category.id }}">
+              {{ category.label }}
+            </label>
+          {% endfor %}
+          {% if not categories %}
+            <span class="text-muted small">No categories yet.</span>
+          {% endif %}
         </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <label class="form-label small text-muted mb-1">Exclude these categories</label>
+        <div class="d-flex flex-wrap gap-2">
+          {% for category in categories %}
+            <input
+                type="checkbox"
+                class="btn-check"
+                name="exclude"
+                value="{{ category.id }}"
+                id="exclude-{{ category.id }}"
+                {% if category.id in selected_excludes %}checked{% endif %}
+            >
+            <label class="btn btn-outline-secondary btn-sm" for="exclude-{{ category.id }}">
+              {{ category.label }}
+            </label>
+          {% endfor %}
+          {% if not categories %}
+            <span class="text-muted small">No categories yet.</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+        <button type="submit" class="btn btn-sm btn-primary">
+          <i class="bi bi-search"></i> Search
+        </button>
+        <a href="{% url 'recipe_search' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
+      </div>
+    </form>
+
+    <a href="{% url 'recipe_create' %}" class="btn btn-primary ms-2">Create Recipe</a>
+  </div>
+
+  {% if has_searched %}
+    <p class="text-muted mb-4">
+      Showing results for:
+      {% if query %}
+        <strong>"{{ query }}"</strong>
+      {% else %}
+        <strong>Any text</strong>
+      {% endif %}
+      {% if selected_includes %}
+        including any of:
+        {% for category_id in selected_includes %}
+          {% for category in categories %}
+            {% if category.id == category_id %}
+              <span class="badge bg-secondary ms-1">{{ c.label }}</span>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+      {% if selected_excludes %}
+        excluding:
+        {% for category_id in selected_excludes %}
+          {% for category in categories %}
+            {% if category.id == category_id %}
+              <span class="badge bg-light text-muted border ms-1">{{ c.label }}</span>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+    </p>
+  {% endif %}
+
+  {% if recipes %}
+    <div class="row">
+      {% for recipe in recipes %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0">
+                  <a href="{% url 'recipe_detail' recipe.pk %}" class="text-decoration-none text-dark">
+                    {{ recipe.title }}
+                  </a>
+                </h5>
+                <div class="d-flex flex-wrap gap-1">
+                  {% for category in recipe.categories.all %}
+                    <span class="badge bg-secondary" style="font-size: 0.75em;">{{ category.label }}</span>
+                  {% empty %}
+                    <span class="badge bg-light text-muted" style="font-size: 0.75em;">No category</span>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <p class="card-text text-muted small">
+                <i class="bi bi-person"></i> <a href="{% url 'profile_page' recipe.author.username %}" class="text-decoration-none">{{ recipe.author.username }}</a>
+                <span class="mx-1">•</span>
+                <i class="bi bi-clock"></i> {{ recipe.created_at|date:"d M Y" }}
+              </p>
+              <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+            </div>
+            <div class="card-footer bg-transparent">
+              <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary">View Recipe</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    {% if has_searched %}
+      <div class="alert alert-warning text-center mt-5">
+        <h4 class="alert-heading">
+          <i class="bi bi-search"></i> No recipes found
+        </h4>
+        <p class="mb-3">
+          We couldn't find any recipes matching
+          <strong>"{{ query }}"</strong>
+          {% if selected_category and selected_category != 'All' %}
+            in <strong>{{ selected_category }}</strong>
+          {% endif %}.
+        </p>
+        <hr>
+        <p class="mb-0">
+          Try a different search term, change the category, or
+          <a href="{% url 'recipe_search' %}" class="alert-link">clear all filters</a>.
+        </p>
+      </div>
     {% else %}
-        {% if has_searched %}
-            <div class="alert alert-warning text-center mt-5">
-                <h4 class="alert-heading">
-                    <i class="bi bi-search"></i> No recipes found
-                </h4>
-                <p class="mb-3">
-                    We couldn't find any recipes matching
-                    <strong>"{{ query }}"</strong>
-                    {% if selected_category and selected_category != 'All' %}
-                        in <strong>{{ selected_category }}</strong>
-                    {% endif %}.
-                </p>
-                <hr>
-                <p class="mb-0">
-                    Try a different search term, change the category, or
-                    <a href="{% url 'recipe_search' %}" class="alert-link">clear all filters</a>.
-                </p>
-            </div>
-        {% else %}
-            <div class="alert alert-info text-center mt-5">
-                <h4 class="alert-heading">
-                    <i class="bi bi-lightbulb"></i> Start searching
-                </h4>
-                <p class="mb-0">Enter a search term or select a category above to find recipes.</p>
-            </div>
-        {% endif %} {% endif %} </div>
+      <div class="alert alert-info text-center mt-5">
+        <h4 class="alert-heading">
+          <i class="bi bi-lightbulb"></i> Start searching
+        </h4>
+        <p class="mb-0">Enter a search term or select a category above to find recipes.</p>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
 {% endblock %}

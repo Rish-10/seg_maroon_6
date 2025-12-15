@@ -12,7 +12,7 @@ The members of the team are:
 The project is called `recipify`.  It currently consists of a single app `recipes`.
 
 ## Deployed version of the application
-The deployed version of the application can be found at [*enter url here*](*enter_url_here*).
+The deployed version of the application can be found at [*https://rishi10.pythonanywhere.com/*](https://rishi10.pythonanywhere.com/).
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  The project source code has been developed using Python 3.12, so you are recommended to use the same version.  From the root of the project:
@@ -53,9 +53,72 @@ Run all tests with:
 $ python3 manage.py test
 ```
 
-*The above instructions should work in your version of the application.  If there are deviations, declare those here in bold.  Otherwise, remove this line.*
-
 ## Sources
 The packages used by this application are specified in `requirements.txt`
 
-*Declare are other sources here, and remove this line*
+Generative AI Use:
+`recipe_form.py`
+class RecipeForm: 15 lines; less than 50% of the unit.
+
+`seed_recipes.py`
+list SAMPLE_RECIPES: 350 lines; whole unit.
+function create_placeholder_image: 5 lines; whole unit.
+class Command: 50 lines; more than 50% of the unit.
+
+`user.py`
+class User: 20 lines; less than 50% of the unit.
+class FollowRequest: 5 lines; about 50% of the unit.
+
+`navbar.html`: 60 lines; more than 50% of the unit.
+
+`recipe_rows.html`: 30 lines; less than 50% of the unit.
+
+`recipe_detail.html`: 150 lines; more than 50% of the unit.
+
+`recipe_form.html`: 60 lines; more than 50% of the unit.
+
+`recipe_list.html`: 60 lines; more than 50% of the unit.
+
+`recipe_search.html`: 120 lines; more than 50% of the unit.
+
+`follow_list.html`: 30 lines; more than 50% of the unit.
+
+`profile_page.html`: 60 lines; less than 50% of the unit.
+
+`profile_search.html`: 60 lines; more than 50% of the unit.
+
+`shopping_list.html`: 10 lines; less than 50% of the unit.
+
+`base_recipe_content.html`: 70 lines; whole unit.
+
+`explore.html`: 20 lines; less than 50% of the unit.
+
+`home.html`: 2 lines; less than 10% of the unit.
+
+`inbox.html`: 80 lines; more than 50% of the unit.
+
+`test_log_in_form.py`: 40 lines; more than 50% of the unit.
+
+`test_password_form.py`: 20 lines; less than 50% of the unit.
+
+`test_rating_form.py`: 15 lines; less than 50% of the unit.
+
+`test_recipe_form`: 40 lines; about 50% of the unit.
+
+`test_signup_form.py`: 20 lines; less than 50% of the unit.
+
+`test_user_form.py`: 10 lines; less than 50% of the unit.
+
+`test_category.py`: 60 lines; more than 50% of the unit.
+
+`test_comment.py`: 50 lines; more than 50% of the unit.
+
+`test_recipe.py`: 60 lines; more than 50% of the unit.
+
+`test_recipe_rating.py`: 20 lines; less than 50% of the unit.
+
+`test_user.py`: 50 lines; less than 50% of the unit.
+
+`dashboard_view.py`
+function dashboard: 30 lines; about 50% of the unit.
+

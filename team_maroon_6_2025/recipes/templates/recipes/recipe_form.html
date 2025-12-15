@@ -2,82 +2,80 @@
 
 {% block content %}
 <div class="container py-5 recipe-create-page">
-    <div class="mb-4">
-        <p class="text-uppercase text-muted small mb-1">
-            {% if is_edit %}Edit{% else %}Create{% endif %}
-        </p>
-        <h1 class="mb-0">
-            {% if is_edit %}
-                Update Your Recipe
-            {% else %}
-                Share a New Recipe
-            {% endif %}
-        </h1>
-    </div>
+  <div class="mb-4">
+    <p class="text-uppercase text-muted small mb-1">
+      {% if is_edit %}Edit{% else %}Create{% endif %}
+    </p>
+    <h1 class="mb-0">
+      {% if is_edit %}
+        Update Your Recipe
+      {% else %}
+        Share a New Recipe
+      {% endif %}
+    </h1>
+  </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-body p-4">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body p-4">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-                        {% for field in form %}
-                            <div class="mb-4">
-                                <label class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                            </div>
-                        {% endfor %}
+            {% for field in form %}
+              <div class="mb-4">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+              </div>
+            {% endfor %}
 
-                        <h2 class="h4 mt-5 mb-3">Recipe Images</h2>
-                        {{ formset.management_form }}
-                        {% for image_form in formset %}
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                {{ image_form.id }}
-                                <div class="mb-3">
-                                    {{ image_form.image.label_tag }}
-                                    {{ image_form.image }}
-                                    {% if image_form.image.errors %}
-                                    <div class="text-danger">{{ image_form.image.errors }}</div>
-                                    {% endif %}
-                                </div>
-                                <div class="mb-3">
-                                    {{ image_form.caption.label_tag }}
-                                    {{ image_form.caption }}
-                                </div>
-                                <div class="mb-3">
-                                    {{ image_form.position.label_tag }}
-                                    {{ image_form.position }}
-                                </div>
-                                {% if image_form.DELETE %}
-                                    <div class="form-check">
-                                    {{ image_form.DELETE }}
-                                    {{ image_form.DELETE.label_tag }}
-                                    </div>
-                                {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-
-
-                        <div class="d-flex gap-2 mt-5">
-                            <button type="submit" class="btn btn-primary flex-fill">
-                                {% if is_edit %}
-                                    Save Changes
-                                {% else %}
-                                    Create Recipe
-                                {% endif %}
-                            </button>
-                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary flex-fill">
-                                Cancel
-                            </a>
-                        </div>
-                    </form>
+            <h2 class="h4 mt-5 mb-3">Recipe Images</h2>
+            {{ formset.management_form }}
+            {% for image_form in formset %}
+              <div class="card mb-3">
+                <div class="card-body">
+                  {{ image_form.id }}
+                  <div class="mb-3">
+                    {{ image_form.image.label_tag }}
+                    {{ image_form.image }}
+                    {% if image_form.image.errors %}
+                      <div class="text-danger">{{ image_form.image.errors }}</div>
+                    {% endif %}
+                  </div>
+                  <div class="mb-3">
+                    {{ image_form.caption.label_tag }}
+                    {{ image_form.caption }}
+                  </div>
+                  <div class="mb-3">
+                    {{ image_form.position.label_tag }}
+                    {{ image_form.position }}
+                  </div>
+                  {% if image_form.DELETE %}
+                    <div class="form-check">
+                      {{ image_form.DELETE }}
+                      {{ image_form.DELETE.label_tag }}
+                    </div>
+                  {% endif %}
                 </div>
-            </div>
+              </div>
+            {% endfor %}
 
+            <div class="d-flex gap-2 mt-5">
+              <button type="submit" class="btn btn-primary flex-fill">
+                {% if is_edit %}
+                  Save Changes
+                {% else %}
+                  Create Recipe
+                {% endif %}
+              </button>
+              <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary flex-fill">
+                Cancel
+              </a>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

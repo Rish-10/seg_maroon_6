@@ -1,99 +1,105 @@
 {% extends 'base_content.html' %}
 
 {% block content %}
-<div class="container py-5 inbox-page">
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-    <div>
-      <p class="text-uppercase text-muted small mb-1">Notifications</p>
-      <h1 class="mb-0">Activity Inbox</h1>
+  <div class="container py-5 inbox-page">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+      <div>
+        <p class="text-uppercase text-muted small mb-1">Notifications</p>
+        <h1 class="mb-0">Activity Inbox</h1>
+      </div>
+
+      <form method="GET" action="{% url 'inbox' %}" class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+        <label for="filter" class="text-muted small mb-0">Filter:</label>
+        <select name="filter" id="filter" class="form-select form-select-sm" style="min-width: 180px;"
+                onchange="this.form.submit()">
+          <option value="all" {% if current_filter == 'all' %}selected{% endif %}>
+            All Notifications
+          </option>
+          <option value="follow" {% if current_filter == 'follow' %}selected{% endif %}>
+            New Followers
+          </option>
+          <option value="request" {% if current_filter == 'request' %}selected{% endif %}>
+            Follow Requests
+          </option>
+          <option value="favourite" {% if current_filter == 'favourite' %}selected{% endif %}>
+            Favourited
+          </option>
+          <option value="comment" {% if current_filter == 'comment' %}selected{% endif %}>
+            Commented
+          </option>
+        </select>
+      </form>
     </div>
 
-    <form method="GET" action="{% url 'inbox' %}" class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-      <label for="filter" class="text-muted small mb-0">Filter:</label>
-      <select name="filter" id="filter" class="form-select form-select-sm" style="min-width: 180px;" onchange="this.form.submit()">
-        <option value="all" {% if current_filter == 'all' %}selected{% endif %}>
-          All Notifications
-        </option>
-        <option value="follow" {% if current_filter == 'follow' %}selected{% endif %}>
-          New Followers
-        </option>
-        <option value="request" {% if current_filter == 'request' %}selected{% endif %}>
-          Follow Requests
-        </option>
-        <option value="favourite" {% if current_filter == 'favourite' %}selected{% endif %}>
-          Favourited
-        </option>
-        <option value="comment" {% if current_filter == 'comment' %}selected{% endif %}>
-          Commented
-        </option>
-      </select>
-    </form>
+    <div class="list-group">
+      {% for notification in notifications %}
+        <div class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+
+          <a href="{% url 'profile_page' notification.sender.username %}">
+            <img src="{{ notification.sender.gravatar }}" alt="{{ notification.sender.username }}"
+                 class="rounded-circle" width="50" height="50">
+          </a>
+
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-center">
+
+              <p class="mb-1">
+                <a href="{% url 'profile_page' notification.sender.username %}"
+                   class="fw-bold text-decoration-none text-dark">
+                  {{ notification.sender.username }}
+                </a>
+
+                {% if notification.notification_type == 'favourite' %}
+                  favourited your recipe
+                  <a href="{% url 'recipe_detail' notification.target_object.pk %}" class="fw-bold text-decoration-none"
+                     style="color: #800020;">
+                    {{ notification.target_object.title }}
+                  </a>.
+
+                {% elif notification.notification_type == 'comment' %}
+                  commented on your recipe
+                  <a href="{% url 'recipe_detail' notification.target_object.recipe.pk %}"
+                     class="fw-bold text-decoration-none" style="color: #800020;">
+                    {{ notification.target_object.recipe.title }}
+                  </a>
+                  with "{{ notification.target_object.body }}".
+
+                {% elif notification.notification_type == 'follow' %}
+                  started following you.
+
+                {% elif notification.notification_type == 'request' %}
+                  requested to follow you.
+                {% endif %}
+              </p>
+
+              <small class="text-muted text-nowrap ms-2">
+                {{ notification.created_at|timesince }} ago
+              </small>
+            </div>
+
+            {% if notification.notification_type == 'request' %}
+              <div class="mt-2">
+                <a href="{% url 'profile_page' notification.sender.username %}" class="btn btn-sm btn-primary">View
+                  Request</a>
+              </div>
+            {% endif %}
+          </div>
+          <div class="ms-auto d-flex align-items-center">
+            <form action="{% url 'delete_notification' notification.pk %}" method="POST" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link text-muted text-decoration-none p-0 fs-5"
+                      title="Delete notification"
+                      onclick="return confirm('Are you sure you want to delete this notification?')">
+                &times;
+              </button>
+            </form>
+          </div>
+        </div>
+      {% empty %}
+        <div class="text-center py-5 text-muted">
+          <p class="mb-0">You have no new notifications.</p>
+        </div>
+      {% endfor %}
+    </div>
   </div>
-
-  <div class="list-group">
-                {% for notification in notifications %}
-                  <div class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
-
-                    <a href="{% url 'profile_page' notification.sender.username %}">
-                        <img src="{{ notification.sender.gravatar }}" alt="{{ notification.sender.username }}" class="rounded-circle" width="50" height="50">
-                    </a>
-
-                    <div class="flex-grow-1">
-                      <div class="d-flex justify-content-between align-items-center">
-
-                        <p class="mb-1">
-                          <a href="{% url 'profile_page' notification.sender.username %}" class="fw-bold text-decoration-none text-dark">
-                            {{ notification.sender.username }}
-                          </a>
-
-                          {% if notification.notification_type == 'favourite' %}
-                            favourited your recipe
-                            <a href="{% url 'recipe_detail' notification.target_object.pk %}" class="fw-bold text-decoration-none" style="color: #800020;">
-                              {{ notification.target_object.title }}
-                            </a>.
-
-                          {% elif notification.notification_type == 'comment' %}
-                            commented on your recipe
-                            <a href="{% url 'recipe_detail' notification.target_object.recipe.pk %}" class="fw-bold text-decoration-none" style="color: #800020;">
-                              {{ notification.target_object.recipe.title }}
-                            </a>
-                            with "{{ notification.target_object.body }}".
-
-                          {% elif notification.notification_type == 'follow' %}
-                            started following you.
-
-                          {% elif notification.notification_type == 'request' %}
-                            requested to follow you.
-                          {% endif %}
-                        </p>
-
-                        <small class="text-muted text-nowrap ms-2">
-                            {{ notification.created_at|timesince }} ago
-                        </small>
-                      </div>
-
-                      {% if notification.notification_type == 'request' %}
-                        <div class="mt-2">
-                            <a href="{% url 'profile_page' notification.sender.username %}" class="btn btn-sm btn-primary">View Request</a>
-                        </div>
-                      {% endif %}
-                    </div>
-                    <div class="ms-auto d-flex align-items-center">
-                      <form action="{% url 'delete_notification' notification.pk %}" method="POST" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-link text-muted text-decoration-none p-0 fs-5"
-                                title="Delete notification"
-                                onclick="return confirm('Are you sure you want to delete this notification?')">
-                                &times;
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-    {% empty %}
-      <div class="text-center py-5 text-muted">
-        <p class="mb-0">You have no new notifications.</p>
-      </div>
-    {% endfor %}
-  </div>
-</div>
 {% endblock %}

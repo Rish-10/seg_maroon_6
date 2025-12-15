@@ -59,17 +59,18 @@ class User(AbstractUser):
         
         return self.gravatar(size=60)
 
-    """ Return the number of followers"""
     @property
     def follower_count(self):
+        """ Return the number of followers"""
         return self.followers.count()
 
-    """Return the number of users this user is following"""
     @property
     def following_count(self):
+        """Return the number of users this user is following"""
         return self.following.count()
-""" Model representing a follow request between users"""
+
 class FollowRequest(models.Model):
+    """ Model representing a follow request between users"""
     follow_requester = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_sent', on_delete=models.CASCADE)
     requested_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_received', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -77,6 +78,7 @@ class FollowRequest(models.Model):
     class Meta:
         unique_together = ('follow_requester', 'requested_user') # Prevent duplicate requests
         ordering = ['-created_at']
-    """Return a readable description of the follow request"""
+
     def __str__(self):
+        """Return a readable description of the follow request"""
         return f"{self.follow_requester} wants to follow {self.requested_user}"
