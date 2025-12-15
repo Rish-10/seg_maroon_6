@@ -27,7 +27,7 @@
 
         <select name="sort" class="form-select" onchange="this.form.submit()" style="min-width: 150px;">
           <option value="newest" {% if active_sort == "newest" %}selected{% endif %}>Newest</option>
-          <option value="likes" {% if active_sort == "likes" %}selected{% endif %}>Most liked</option>
+          <option value="favourites" {% if active_sort == "favourites" %}selected{% endif %}>Most favourited</option>
           <option value="rating" {% if active_sort == "rating" %}selected{% endif %}>Highest rated</option>
           <option value="comments" {% if active_sort == "comments" %}selected{% endif %}>Most commented</option>
           <option value="title" {% if active_sort == "title" %}selected{% endif %}>Title A-Z</option>

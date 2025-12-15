@@ -56,6 +56,12 @@ class Recipe(models.Model):
         return self.likes.count()
     
     @property
+    def favourites_count(self):
+        """Returns how many users have favourited the recipe."""
+        return self.favourited_by.count()
+
+    
+    @property
     def rating_count(self): 
         return self.ratings.count() 
     

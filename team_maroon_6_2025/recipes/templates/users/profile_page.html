@@ -86,12 +86,6 @@
                 Favourites
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link {% if current_section == 'liked_recipes' %}active{% endif %}"
-                href="{% url 'profile_likes' profile_user.username %}">
-                  Likes
-              </a>
-            </li>
             {% if request.user == profile_user %}
               <li class="nav-item">
                 <a class="nav-link {% if current_section == 'shopping_list' %}active{% endif %}"

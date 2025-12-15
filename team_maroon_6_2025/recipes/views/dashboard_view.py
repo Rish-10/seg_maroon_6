@@ -33,9 +33,10 @@ def dashboard(request):
         .prefetch_related("comments__author", "categories")
         .annotate(
             likes_total=Count("likes", distinct=True),
+            favourites_total=Count("favourited_by", distinct=True),
             rating_avg=Avg("ratings__rating"),
             rating_total=Count("ratings", distinct=True),
-            comment_total=Count("comments", distinct=True),
+            comment_total=Count("comments", distinct=True)
         )
     )
 
@@ -48,12 +49,12 @@ def dashboard(request):
         recipes_qs.order_by("-created_at")[:3]
     )
     featured_recipes = list(
-        recipes_qs.order_by("-likes_total", "-created_at")[:3]
+        recipes_qs.order_by("-favourites_total", "-created_at")[:3]
     )
 
     ordering_map = {
         "newest": ("-created_at",),
-        "likes": ("-likes_total", "-created_at"),
+        "favourites": ("-favourites_total", "-created_at"),
         "rating": ("-rating_avg", "-rating_total", "-created_at"),
         "comments": ("-comment_total", "-created_at"),
         "title": ("title",),
@@ -80,7 +81,7 @@ def dashboard(request):
         recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:3]
     )
     latest_recipes = list(recipes_qs.order_by("-created_at")[:3])
-    featured_recipes = list(recipes_qs.order_by("-likes_total", "-created_at")[:3])
+    featured_recipes = list(recipes_qs.order_by("-favourites_total", "-created_at")[:3])
 
     categories = list(Category.objects.order_by("label"))
     column_size = max(1, math.ceil(len(categories) / 3))
