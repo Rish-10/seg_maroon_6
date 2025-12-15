@@ -130,7 +130,7 @@
                 {% with url_name=request.resolver_match.url_name %}
                   {% if url_name == "dashboard" %}
                     <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-light">Clear All</a>
-                  {% elif url_name == "profile_page" or url_name == "profile_favourites" or url_name == "profile_likes" %}
+                  {% elif url_name == "profile_page" or url_name == "profile_favourites" %}
                     <a href="{{ request.path }}" class="btn btn-sm btn-outline-light">Clear All</a>
                   {% else %}
                     <a href="{% url 'recipe_list' %}" class="btn btn-sm btn-outline-light">Clear All</a>
@@ -141,7 +141,6 @@
                   Apply Filters
                 </button>
               </div>
-
             </div>
           </div>
         </div>

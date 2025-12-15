@@ -55,8 +55,6 @@ def profile_page(request, username, section="posted_recipes"):
 
     if section == "favourite_recipes":
         user_recipes = profile_user.favourites.prefetch_related(*base_prefetch).order_by("-created_at")
-    elif section == "liked_recipes":
-        user_recipes = profile_user.liked_recipes.prefetch_related(*base_prefetch).order_by("-created_at")
     else:
         user_recipes = profile_user.recipes.prefetch_related(*base_prefetch).order_by("-created_at")
 

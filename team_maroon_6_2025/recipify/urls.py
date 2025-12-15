@@ -39,7 +39,6 @@ urlpatterns = [
     path('search/', views.search_redirect, name='search'),
     path('profile/search/', views.profile_search, name='profile_search'),
     path('profile/<str:username>/', views.profile_page, kwargs={'section': 'posted_recipes'}, name='profile_page'),
-    path('profile/<str:username>/likes/', views.profile_page, kwargs={'section': 'liked_recipes'}, name='profile_likes'),
     path('profile/<str:username>/favourites/', views.profile_page, kwargs={'section': 'favourite_recipes'}, name='profile_favourites'),
     path('follow/<str:username>/', views.follow_toggle, name='follow_toggle'),
     path('follow/accept/<str:username>/', views.accept_follow_request, name='accept_request'),
