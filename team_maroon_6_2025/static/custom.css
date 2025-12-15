@@ -25,14 +25,14 @@
 /* beige background for all main pages */
 body:has(.explore-page), body:has(.recipe-list-page), body:has(.recipe-create-page),
 body:has(.profile-page), body:has(.user-profile-page), body:has(.inbox-page),
-body:has(.recipe-detail-page), body:has(.container.py-5:first-child) {
+body:has(.recipe-detail-page), body:has(.follow-list-page), body:has(.container.py-5:first-child) {
   background: #F5F2ED !important;
   min-height: 100vh !important;
 }
 
 /* default font and color for pages */
 .explore-page, .recipe-list-page, .recipe-create-page, .profile-page,
-.user-profile-page, .inbox-page, .recipe-detail-page {
+.user-profile-page, .inbox-page, .recipe-detail-page, .follow-list-page {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   color: #000 !important;
 }
@@ -44,6 +44,7 @@ body:has(.recipe-detail-page), body:has(.container.py-5:first-child) {
 .profile-page h1, .profile-page h2,
 .user-profile-page h1, .user-profile-page h2,
 .inbox-page h1, .inbox-page h2,
+.follow-list-page h1, .follow-list-page h2,
 .recipe-detail-page h1, .recipe-detail-page h3, .recipe-detail-page .h4,
 .recipe-detail-page .recipe-title {
   font-family: 'Playfair Display', serif !important;
@@ -110,7 +111,8 @@ body:has(.recipe-detail-page), body:has(.container.py-5:first-child) {
 
 /* list items same as cards */
 .explore-page .list-group-item, .recipe-list-page .list-group-item,
-.profile-page .list-group-item, .inbox-page .list-group-item {
+.profile-page .list-group-item, .inbox-page .list-group-item,
+.follow-list-page .list-group-item {
   background: rgba(255, 255, 255, 0.95) !important;
   border: none !important;
   border-left: 4px solid #800020 !important;
@@ -121,7 +123,8 @@ body:has(.recipe-detail-page), body:has(.container.py-5:first-child) {
 }
 
 .explore-page .list-group-item:hover, .recipe-list-page .list-group-item:hover,
-.profile-page .list-group-item:hover, .inbox-page .list-group-item:hover {
+.profile-page .list-group-item:hover, .inbox-page .list-group-item:hover,
+.follow-list-page .list-group-item:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
 }
@@ -289,14 +292,16 @@ body:has(.recipe-detail-page), body:has(.container.py-5:first-child) {
 }
 
 /* links are black by default, maroon on hover */
-.explore-page a, .recipe-list-page a, .user-profile-page a, .recipe-detail-page a {
+.explore-page a, .recipe-list-page a, .user-profile-page a, .recipe-detail-page a,
+.follow-list-page a {
   color: #000 !important;
   text-decoration: none !important;
   transition: all 0.2s ease !important;
 }
 
 .explore-page a:hover, .recipe-list-page a:hover,
-.user-profile-page a:hover, .recipe-detail-page a:hover {
+.user-profile-page a:hover, .recipe-detail-page a:hover,
+.follow-list-page a:hover {
   color: #800020 !important;
 }
 

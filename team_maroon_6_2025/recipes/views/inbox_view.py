@@ -11,15 +11,14 @@ def inbox(request):
 
     filter_type = request.GET.get('filter', 'all')
 
-    match filter_type:
-        case 'favourite':
-            notifications = notifications.filter(notification_type='favourite')
-        case 'comment':
-            notifications = notifications.filter(notification_type='comment')
-        case 'follow':
-            notifications = notifications.filter(notification_type='follow')
-        case 'request':
-            notifications = notifications.filter(notification_type='request')
+    if filter_type == 'favourite':
+        notifications = notifications.filter(notification_type='favourite')
+    elif filter_type == 'comment':
+        notifications = notifications.filter(notification_type='comment')
+    elif filter_type == 'follow':
+        notifications = notifications.filter(notification_type='follow')
+    elif filter_type == 'request':
+        notifications = notifications.filter(notification_type='request')
 
     context = {
         'notifications': notifications,
@@ -29,13 +28,11 @@ def inbox(request):
     return render(request, 'inbox.html', context)
 
 @login_required
-@require_POST  # Security: Prevent deletion via simple URL typing
+@require_POST
 def delete_notification(request, pk):
     notification = get_object_or_404(Notification, pk=pk)
 
-    # Security: Ensure only the owner can delete it
     if notification.recipient == request.user:
         notification.delete()
 
-    # Redirect back to inbox.
     return redirect('inbox')
