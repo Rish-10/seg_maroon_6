@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
 
 
@@ -6,7 +6,13 @@ def search_redirect(request):
     query = request.GET.get("q", "").strip()
     return_to = request.GET.get('return_to', '/')
 
-    if not query:
+    params = request.GET.copy()
+    if 'return_to' in params:
+        del params['return_to']
+
+    encoded_parameters = params.urlencode()
+
+    if not encoded_parameters:
         return redirect(return_to)
 
     if query.startswith("@"):
@@ -25,6 +31,6 @@ def search_redirect(request):
     is_context_search = any(return_to.startswith(context) for context in allowed_contexts) and not any(return_to.endswith(context) for context in disallowed_contexts)
 
     if is_context_search:
-        return redirect(f"{return_to}?q={query}")
+        return redirect(f"{return_to}?{encoded_parameters}")
 
-    return redirect(f"{reverse('recipe_list')}?q={query}")
+    return redirect(f"{reverse('recipe_list')}?{encoded_parameters}")
