@@ -87,6 +87,13 @@
                             class="btn btn-sn btn-outline-secondary ms-2">
                             Edit recipe
                         </a>
+                        <form class="d-inline" method="post" action="{% url 'recipe_delete' recipe.pk %}" onsubmit="return confirm('Are you sure you want to delete this recipe?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'recipe_list' %}">
+                            <button class="btn btn-sn btn-outline-danger ms-2" type="submit">
+                                Delete
+                            </button>
+                        </form>
                     {% endif %}
                     {% if recipe.images.all %}
                         <div id="recipeImages" class="carousel slide mb-4" data-bs-ride="carousel">

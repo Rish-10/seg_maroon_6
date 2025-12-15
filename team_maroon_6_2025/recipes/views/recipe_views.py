@@ -191,6 +191,21 @@ def recipe_edit(request, pk):
         },
     )
 
+# Delete an existing recipe owned by the current user
+@login_required
+@require_POST
+def recipe_delete(request, pk):
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    if recipe.author != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this recipe.")
+
+    recipe.delete()
+    messages.success(request, "Recipe deleted.")
+
+    next_url = request.POST.get("next") or reverse("recipe_list")
+    return redirect(next_url)
+
 # Save or update a user's rating for a recipe
 @login_required
 @require_POST

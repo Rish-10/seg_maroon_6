@@ -51,6 +51,7 @@ urlpatterns = [
     path("recipes/<int:pk>/like/", like_views.toggle_like, name="recipe_like_toggle"),
     path("recipes/<int:pk>/comments/add/", comment_views.add_comment, name="comment_add"),
     path('recipes/<int:pk>/edit/', views.recipe_edit, name='recipe_edit'),
+    path('recipes/<int:pk>/delete/', views.recipe_delete, name='recipe_delete'),
     path("comments/<int:comment_id>/edit/", comment_views.edit_comment, name="comment_edit"),
     path("comments/<int:comment_id>/like/", comment_views.toggle_comment_like, name="comment_like_toggle"),
     path("recipes/<int:pk>/rate/", views.rate_recipe, name="recipe_rate"),
