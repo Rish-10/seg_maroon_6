@@ -8,7 +8,7 @@ is swallowed and generation continues.
 """
 
 from faker import Faker
-from random import randint, random
+from random import randint
 from django.core.management.base import BaseCommand, CommandError
 from recipes.models import User
 
@@ -172,16 +172,17 @@ class Command(BaseCommand):
 
 def create_username(first_name, last_name):
     """
-    Construct a simple username from first and last names.
+    Construct a username that satisfies the @ + alphanumerics rule.
 
-    Args:
-        first_name (str): Given name.
-        last_name (str): Family name.
-
-    Returns:
-        str: A username in the form ``@{firstname}{lastname}`` (lowercased).
+    Adds a numeric suffix to avoid collisions and trims to fit the 30-char limit.
     """
-    return '@' + first_name.lower() + last_name.lower()
+    base = _safe_token(first_name, "user") + _safe_token(last_name, "seed")
+    if len(base) < 3:
+        base += "".join(_rand_digits(3))
+    base = base[:23]  # leave space for @ and a 3-digit suffix
+    suffix = "".join(_rand_digits(3))
+    username = f"@{base}{suffix}"
+    return username[:30]
 
 def create_email(first_name, last_name):
     """
@@ -190,8 +191,20 @@ def create_email(first_name, last_name):
     Args:
         first_name (str): Given name.
         last_name (str): Family name.
-
     Returns:
-        str: An email in the form ``{firstname}.{lastname}@example.org``.
+        str: An email in the form ``{firstname}.{lastname}{rand}@example.org``.
     """
-    return first_name + '.' + last_name + '@example.org'
+    local = f"{_safe_token(first_name, 'user')}.{_safe_token(last_name, 'seed')}".strip(".")
+    local = local or "user.seed"
+    return f"{local}{randint(1000,9999)}@example.org"
+
+
+def _safe_token(value, default):
+    """Return only alphanumerics from value; fall back to default if empty."""
+    cleaned = "".join(ch for ch in value.lower() if ch.isalnum())
+    return cleaned or default
+
+
+def _rand_digits(count):
+    """Generate a list of random digit characters."""
+    return [str(randint(0, 9)) for _ in range(count)]
