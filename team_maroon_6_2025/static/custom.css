@@ -425,6 +425,11 @@ body:has(.recipe-detail-page), body:has(.follow-list-page), body:has(.container.
   color: #fff !important;
 }
 
+.btn-check + label {
+  border-radius: 0 !important;
+  transition: all 0.2s ease; 
+}
+
 .navbar .btn-outline-light {
   color: #fff !important;
   border-color: #fff !important;
@@ -464,6 +469,24 @@ body:has(.recipe-detail-page), body:has(.follow-list-page), body:has(.container.
 .navbar #navSearch .btn-light:hover {
   background: #000 !important;
   color: #F5F2ED !important;
+}
+
+#navSearch .btn-check[name="meal"]:checked + label {
+  background: #000 !important;
+  color: #F5F2ED !important;
+  border-color: #000 !important;
+}
+
+#navSearch .btn-check[name="dietary"]:checked + label {
+  background: #1b6b2a !important;
+  color: #fff !important;
+  border-color: #1b6b2a !important;
+}
+
+#navSearch .btn-check[name="exclude"]:checked + label {
+  background: #800020 !important;
+  color: #fff !important;
+  border-color: #800020 !important;
 }
 
 .recipe-card h5 {
