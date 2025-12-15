@@ -1,10 +1,7 @@
 import io
-from random import choice, randint, sample
-
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
-from faker import Faker
 from PIL import Image
 
 from recipes.models import Category, Recipe, RecipeImage, User
@@ -392,22 +389,8 @@ def create_placeholder_image(text: str) -> ContentFile:
 
 class Command(BaseCommand):
     help = "Seed sample recipes with images and categories"
-    RECIPE_COUNT = 80
 
     def handle(self, *args, **options):
-        faker = Faker()
-        authors = list(User.objects.filter(is_staff=False))
-        if not authors:
-            authors = [
-                User.objects.create_user(
-                    username='@chef',
-                    email='chef@example.com',
-                    password='Password123',
-                    first_name='Chef',
-                    last_name='Demo',
-                )
-            ]
-
         # Ensure categories exist
         for rec in SAMPLE_RECIPES:
             for key in rec["categories"]:
@@ -430,12 +413,22 @@ class Command(BaseCommand):
         for key, label in defaults:
             Category.objects.get_or_create(key=key, defaults={"label": label})
 
+        author = User.objects.filter(is_staff=False).first()
+        if not author:
+            author = User.objects.create_user(
+                username='@chef',
+                email='chef@example.com',
+                password='Password123',
+                first_name='Chef',
+                last_name='Demo',
+            )
+
         created = 0
         for rec in SAMPLE_RECIPES:
             recipe, was_created = Recipe.objects.get_or_create(
                 title=rec["title"],
                 defaults={
-                    "author": choice(authors),
+                    "author": author,
                     "description": rec["description"],
                     "ingredients": "\n".join(rec["ingredients"]),
                     "instructions": "\n".join(rec["instructions"]),
@@ -453,44 +446,4 @@ class Command(BaseCommand):
                 img_file = create_placeholder_image(rec["title"])
                 RecipeImage.objects.create(recipe=recipe, image=img_file, caption=rec["title"])
 
-        # Fill up to RECIPE_COUNT with generated recipes
-        categories = list(Category.objects.all())
-        attempts = 0
-        while Recipe.objects.count() < self.RECIPE_COUNT and attempts < self.RECIPE_COUNT * 3:
-            attempts += 1
-            data = self._fake_recipe(faker, categories)
-            recipe, was_created = Recipe.objects.get_or_create(
-                title=data["title"],
-                defaults={
-                    "author": choice(authors),
-                    "description": data["description"],
-                    "ingredients": "\n".join(data["ingredients"]),
-                    "instructions": "\n".join(data["instructions"]),
-                },
-            )
-            if not was_created:
-                continue
-            created += 1
-            recipe.categories.set(data["category_ids"])
-            img_file = create_placeholder_image(data["title"])
-            RecipeImage.objects.create(recipe=recipe, image=img_file, caption=data["title"])
-
-        total = Recipe.objects.count()
-        self.stdout.write(self.style.SUCCESS(f"Seeded recipes (new: {created}, total: {total})."))
-
-    def _fake_recipe(self, faker: Faker, categories):
-        """Build a fake recipe payload."""
-        title = faker.unique.catch_phrase()[:180] + f" #{randint(1000,9999)}"
-        description = faker.sentence(nb_words=16)
-        ingredients = [faker.word().title() + " " + faker.random_element(elements=("100g", "2 tbsp", "1 cup", "to taste"))
-                       for _ in range(6)]
-        instructions = [faker.sentence(nb_words=14) for _ in range(4)]
-        picked = sample(categories, k=min(len(categories), randint(1, 3)))
-        category_ids = [c.id for c in picked]
-        return {
-            "title": title,
-            "description": description,
-            "ingredients": ingredients,
-            "instructions": instructions,
-            "category_ids": category_ids,
-        }
+        self.stdout.write(self.style.SUCCESS(f"Seeded recipes (new: {created})."))
