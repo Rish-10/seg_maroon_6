@@ -7,8 +7,8 @@ def search_redirect(request):
     return_to = request.GET.get('return_to', '/')
 
     params = request.GET.copy()
-    if 'return_to' in params:
-        del params['return_to']
+    params.pop('return_to', None)
+
 
     encoded_parameters = params.urlencode()
 

@@ -31,7 +31,9 @@ def shopping_list_add_recipe(request, pk):
         messages.success(request, f"Added {added} ingredients to your shopping list.")
     else:
         messages.info(request, "Those ingredients were already on your shopping list.")
-    return redirect(request.POST.get("next") or "recipe_detail", pk=recipe.pk)
+    next_url = request.POST.get("next")
+    return redirect(next_url or "recipe_detail", pk=recipe.pk)
+
 
 # Add a single item to the user's shopping list
 @login_required

@@ -16,7 +16,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     logged-in users via `LoginRequiredMixin`.
     """
 
-    model = UserForm
+    model = User
     template_name = "profile.html"
     form_class = UserForm
 
@@ -51,6 +51,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["favourites"] = self.request.user.favourites.select_related("author").order_by("-created_at")
         return context
+    
     """Handle follow requests when a user switches from private to public"""
     def form_valid(self, form):
         user = self.object

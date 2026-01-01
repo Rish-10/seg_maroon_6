@@ -1,9 +1,11 @@
-from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count
-from django.shortcuts import render
-from recipes.models import Recipe, RecipeRating, Category, User
-from recipes.search_filters import filter_recipes
 import math 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+from recipes.helpers import RECIPE_ORDERING, base_recipe_queryset, attach_user_ratings
+from recipes.models import Category
+from recipes.search_filters import filter_recipes
+
 
 
 @login_required
@@ -17,33 +19,14 @@ def dashboard(request):
     """
 
     current_user = request.user
-    recipes_qs = search_recipes(request)
 
-    ordering_map = {
-        "newest": ("-created_at",),
-        "favourites": ("-favourites_total", "-created_at"),
-        "rating": ("-rating_avg", "-rating_total", "-created_at"),
-        "comments": ("-comment_total", "-created_at"),
-        "title": ("title",),
-    }
+    recipes_qs = filter_recipes(request, base_recipe_queryset(include_comments=True))
 
     sort = request.GET.get("sort", "newest")
-    recipes = list(recipes_qs.order_by(*ordering_map.get(sort, ("-created_at",))))
+    ordering = RECIPE_ORDERING.get(sort, ("-created_at",))
+    recipes = list(recipes_qs.order_by(*ordering))
 
-    recipe_ids = [recipe.id for recipe in recipes]
-    user_ratings = {}
-    
-    if recipe_ids:
-        user_ratings = {
-            rating.recipe_id: rating.rating 
-            for rating in RecipeRating.objects.filter(
-                user = current_user, 
-                recipe_id__in = recipe_ids
-            )
-        }
-
-    for recipe in recipes: 
-        recipe.user_rating_value = user_ratings.get(recipe.id)
+    attach_user_ratings(recipes, current_user)
 
     top_rated_recipes = list(
         recipes_qs.order_by("-rating_avg", "-rating_total", "-created_at")[:3]
@@ -78,17 +61,3 @@ def dashboard(request):
             ),
         },
     )
-
-# Build and return a filtered queryset of recipes based on search parameters
-def search_recipes(request):
-    recipes_qs = (
-        Recipe.objects.select_related("author")
-        .prefetch_related("comments__author", "categories")
-        .annotate(
-            favourites_total=Count("favourited_by", distinct=True),
-            rating_avg=Avg("ratings__rating"),
-            rating_total=Count("ratings", distinct=True),
-            comment_total=Count("comments", distinct=True),
-        )
-    )
-    return filter_recipes(request, recipes_qs)

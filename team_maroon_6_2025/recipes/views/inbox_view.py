@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from recipes.models.notification import Notification
 from django.views.decorators.http import require_POST
+from recipes.models.notification import Notification
 
 # Display the user's notification inbox with optional filtering
 @login_required

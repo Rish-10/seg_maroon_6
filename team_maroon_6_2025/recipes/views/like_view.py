@@ -10,7 +10,7 @@ from recipes.models import Recipe
 def toggle_like(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
 
-    if request.user in recipe.likes.all():
+    if recipe.likes.filter(pk=request.user.pk).exists():
         recipe.likes.remove(request.user)
         messages.info(request, f"You unliked '{recipe.title}'.")
     else:

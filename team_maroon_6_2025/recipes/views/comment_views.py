@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from recipes.forms import CommentForm
@@ -49,7 +49,7 @@ def edit_comment(request, comment_id):
 @login_required
 def toggle_comment_like(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
-    if request.user in comment.likes.all():
+    if comment.likes.filter(pk=request.user.pk).exists():
         comment.likes.remove(request.user)
         messages.info(request, "Comment unliked.")
     else:

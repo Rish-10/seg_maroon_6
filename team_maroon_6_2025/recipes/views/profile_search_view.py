@@ -1,7 +1,6 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from recipes.models import Recipe, User
 from recipes.search_filters import filter_users
 
 # Search for users by username and redirect if only one result is found

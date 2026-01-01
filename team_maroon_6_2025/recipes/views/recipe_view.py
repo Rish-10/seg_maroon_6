@@ -6,13 +6,12 @@ from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from django.db import models 
-from django.db.models import Avg, Count, Q
 from django.core.paginator import Paginator
 
 from recipes.models import Category, Recipe, RecipeImage, RecipeRating
 from recipes.forms import RecipeForm, CommentForm, RecipeImageForm, RecipeRatingForm
-from recipes.search_filters import filter_recipes  # Import the helper
+from recipes.search_filters import filter_recipes 
+from recipes.helpers import RECIPE_ORDERING, base_recipe_queryset, attach_user_ratings
 
 RecipeImageFormSet = inlineformset_factory(
     Recipe,
@@ -24,41 +23,12 @@ RecipeImageFormSet = inlineformset_factory(
 # Display the recipe list with filtering, sorting, pagination, and following feed
 def recipe_list(request):
     sort = request.GET.get("sort", "newest")
-    ordering_map = {
-        "newest": ("-created_at",),
-        "favourites": ("-favourites_total", "-created_at"),
-        "rating": ("-rating_avg", "-rating_total", "-created_at"),
-        "comments": ("-comment_total", "-created_at"),
-        "title": ("title",),
-    }
+    ordering = RECIPE_ORDERING.get(sort, ("-created_at",))
 
-    recipes_qs = (
-        Recipe.objects.select_related("author")
-        .prefetch_related("comments__author", "categories")
-        .annotate(
-            favourites_total=Count("favourited_by", distinct=True),
-            rating_avg=Avg("ratings__rating"),
-            rating_total=Count("ratings", distinct=True),
-            comment_total=Count("comments", distinct=True)
-        )
-    )
 
-    recipes_qs = filter_recipes(request, recipes_qs)
-
-    ordering = ordering_map.get(sort, ("-created_at",))
-    feed_recipes = list(recipes_qs.order_by(*ordering))
-    
-    following_recipes = []
-    if request.user.is_authenticated:
-        following_ids = list(
-            request.user.following.values_list("id", flat=True)
-        )
-        if following_ids:
-            following_qs = recipes_qs.filter(author_id__in=following_ids)
-            following_recipes = list(following_qs.order_by(*ordering))
+    recipes_qs = filter_recipes(request, base_recipe_queryset(include_comments=True))
 
     recipes_qs = recipes_qs.distinct()
-    ordering = ordering_map.get(sort, ("-created_at",))
 
     paginator = Paginator(recipes_qs.order_by(*ordering), 10)
     page_number = request.GET.get("page") or 1
@@ -75,20 +45,8 @@ def recipe_list(request):
                 .order_by(*ordering)
             )
 
-    user_ratings = {}
-    if request.user.is_authenticated:
-        recipe_ids = {r.id for r in chain(feed_recipes, following_recipes)}
-        if recipe_ids:
-            user_ratings = {
-                rating.recipe_id: rating.rating
-                for rating in RecipeRating.objects.filter(
-                    user=request.user,
-                    recipe_id__in=recipe_ids,
-                )
-            }
 
-    for recipe in chain(feed_recipes, following_recipes):
-        recipe.user_rating_value = user_ratings.get(recipe.id)
+    attach_user_ratings(chain(feed_recipes, following_recipes), request.user)
 
     categories = Category.objects.order_by("label")
 

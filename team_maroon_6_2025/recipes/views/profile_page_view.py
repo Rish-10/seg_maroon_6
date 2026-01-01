@@ -1,14 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-
-from recipes.forms import ShoppingListItemForm
-from recipes.models import FollowRequest, User
 
 from recipes.forms import ShoppingListItemForm
 from recipes.models import FollowRequest, User
 from recipes.models.notification import Notification
 from recipes.search_filters import filter_recipes
+
 # Display a user's profile page with recipes, follow status, and privacy handling
 def profile_page(request, username, section="posted_recipes"):
     profile_user = get_object_or_404(User, username=username)
