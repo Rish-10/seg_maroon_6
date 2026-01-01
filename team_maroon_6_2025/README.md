@@ -122,3 +122,6 @@ class FollowRequest: 5 lines; about 50% of the unit.
 `dashboard_view.py`
 function dashboard: 30 lines; about 50% of the unit.
 
+`favourite_view.py`: 20 lines; less than 50% of the unit.
+
+`profile_page_view.py`: 

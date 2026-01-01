@@ -1,8 +1,13 @@
 from django import forms
 from recipes.models.recipe import Recipe, Category
 
-# Form for creating or editing a recipe
 class RecipeForm(forms.ModelForm):
+    """
+    Form for creating or editing a recipe.
+
+    This form collects all of the necessary attributes for the creation
+    of a recipe.
+    """
     class Meta:
         model = Recipe
         fields = ['title', 'description', 'ingredients', 'instructions', 'categories']
@@ -30,6 +35,7 @@ class RecipeForm(forms.ModelForm):
             }),
             'categories': forms.CheckboxSelectMultiple()
         }
+
     # Initialise the form and configure the category field
     def __init__(self, *args, **kwargs): 
         super().__init__(*args, **kwargs)

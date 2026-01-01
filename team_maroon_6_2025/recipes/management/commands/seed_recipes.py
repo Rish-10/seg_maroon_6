@@ -388,6 +388,15 @@ def create_placeholder_image(text: str) -> ContentFile:
 
 
 class Command(BaseCommand):
+    """
+    Build automation command to seed the database with recipe data.
+
+    This command seeds the database with some fake recipes.
+
+    Attributes:
+        help (str): Short description shown in ``manage.py help``.
+    """
+
     help = "Seed sample recipes with images and categories"
 
     def handle(self, *args, **options):

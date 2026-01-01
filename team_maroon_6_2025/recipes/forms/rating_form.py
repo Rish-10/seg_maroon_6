@@ -1,8 +1,12 @@
 from django import forms 
 from recipes.models import RecipeRating 
 
-# Form for submitting a rating for a recipe
 class RecipeRatingForm(forms.ModelForm):
+    """
+    Form for submitting a rating on a recipe.
+
+    This form collects the number of stars the user wishes to give a recipe.
+    """
     class Meta:
         model = RecipeRating
         fields = ["rating"]

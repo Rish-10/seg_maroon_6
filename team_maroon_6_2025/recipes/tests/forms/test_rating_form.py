@@ -2,7 +2,6 @@ from django.test import TestCase
 from recipes.forms import RecipeRatingForm
 from recipes.models import RecipeRating, Recipe, User
 
-
 class RecipeRatingFormTestCase(TestCase):
 
     def setUp(self):

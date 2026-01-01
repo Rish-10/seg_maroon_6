@@ -12,14 +12,15 @@ def inbox(request):
 
     filter_type = request.GET.get('filter', 'all')
 
-    if filter_type == 'favourite':
-        notifications = notifications.filter(notification_type='favourite')
-    elif filter_type == 'comment':
-        notifications = notifications.filter(notification_type='comment')
-    elif filter_type == 'follow':
-        notifications = notifications.filter(notification_type='follow')
-    elif filter_type == 'request':
-        notifications = notifications.filter(notification_type='request')
+    match filter_type:
+        case 'favourite':
+            notifications = notifications.filter(notification_type='favourite')
+        case 'comment':
+            notifications = notifications.filter(notification_type='comment')
+        case 'follow':
+            notifications = notifications.filter(notification_type='follow')
+        case 'request':
+            notifications = notifications.filter(notification_type='request')
 
     context = {
         'notifications': notifications,

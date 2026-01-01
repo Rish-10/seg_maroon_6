@@ -24,6 +24,7 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
     # Return a readable description of the notification
     def __str__(self):
         return f"{self.sender} -> {self.recipient} ({self.notification_type})"

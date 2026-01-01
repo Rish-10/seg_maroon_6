@@ -1,8 +1,14 @@
 from django import forms
 from recipes.models import Comment
 
-# Form for creating a new comment on a recipe
 class CommentForm(forms.ModelForm):
+    """
+    Form for creating a new comment on a recipe.
+
+    This form collects the body of the comment (the message contents)
+    the user wishes to make.
+    """
+
     class Meta:
         model = Comment
         fields = ["body"]

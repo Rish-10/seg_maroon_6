@@ -3,6 +3,16 @@ from recipes.models import Category
 
 
 class Command(BaseCommand):
+    """
+    Build automation command to seed the database with category data.
+
+    This command seeds the database with the default categories
+    and their labels.
+
+    Attributes:
+        DEFAULT_CATEGORIES (list): A list of categories to seed the database.
+        help (str): Short description shown in ``manage.py help``.
+    """
     help = "Seed the default recipe categories"
 
     DEFAULT_CATEGORIES = [
@@ -21,6 +31,11 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        """
+        Django entrypoint for the command.
+
+        Seeds the default recipe categories.
+        """
         created = 0
         for key, label in self.DEFAULT_CATEGORIES:
             obj, was_created = Category.objects.get_or_create(key = key, defaults = {"label": label})
