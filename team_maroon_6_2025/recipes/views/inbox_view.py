@@ -3,7 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from recipes.models.notification import Notification
 
-# Display the user's notification inbox with optional filtering
+""" 
+Display the user's notification inbox with optional filtering
+"""
 @login_required
 def inbox(request):
     notifications = Notification.objects.filter(
@@ -29,7 +31,10 @@ def inbox(request):
 
     return render(request, 'inbox.html', context)
 
-# Delete a notification belonging to the current user
+""" 
+Delete a notification belonging to the current user
+Allows users to remove individual notifcations from their inbox
+"""
 @login_required
 @require_POST
 def delete_notification(request, pk):

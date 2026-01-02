@@ -20,7 +20,14 @@ RecipeImageFormSet = inlineformset_factory(
     extra=3,
     can_delete=True,
 )
-# Display the recipe list with filtering, sorting, pagination, and following feed
+"""
+Display the recipe list with filtering, sorting, pagination, and following feed
+Serves as the main recipe browsing interface, supporting multiple features: supporting multiple features:
+filtering by categories and search terms, sorting by various criteria (newest, popular, highest rated),
+and pagination with 10 recipes per page. For authenticated users, it
+generates an additional "following feed" containing recipes from users they follow,
+displayed separately from the main feed.
+"""
 def recipe_list(request):
     sort = request.GET.get("sort", "newest")
     ordering = RECIPE_ORDERING.get(sort, ("-created_at",))
@@ -62,7 +69,9 @@ def recipe_list(request):
             "query": request.GET.get("q", ""),
         },
     )
-# Display a single recipe with comments and rating information
+"""
+Display a single recipe with comments, rating information, and user information
+"""
 def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     comments = recipe.comments.select_related("author")
@@ -92,7 +101,9 @@ def recipe_detail(request, pk):
 
     return render(request, "recipes/recipe_detail.html", context)
 
-# Create a new recipe with optional images
+"""
+Create a new recipe with optional images
+"""
 def recipe_create(request):
     if request.method == "POST":
         form = RecipeForm(request.POST)
@@ -119,7 +130,9 @@ def recipe_create(request):
         },
     )
 
-# Edit an existing recipe owned by the current user
+"""
+Edit an existing recipe owned by the current user
+"""
 @login_required
 def recipe_edit(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
@@ -149,7 +162,9 @@ def recipe_edit(request, pk):
         },
     )
 
-# Delete an existing recipe owned by the current user
+"""
+Delete an existing recipe owned by the current user
+"""
 @login_required
 @require_POST
 def recipe_delete(request, pk):
@@ -164,8 +179,9 @@ def recipe_delete(request, pk):
     next_url = request.POST.get("next") or reverse("recipe_list")
     return redirect(next_url)
 
-# Save or update a user's rating for a recipe
-@login_required
+"""
+Save or update a user's rating for a recipe
+"""@login_required
 @require_POST
 def rate_recipe(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)

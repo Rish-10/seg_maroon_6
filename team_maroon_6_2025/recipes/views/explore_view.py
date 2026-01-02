@@ -2,7 +2,9 @@ from django.shortcuts import render
 from recipes.models import Category
 from recipes.helpers import base_recipe_queryset 
 
-# Display the explore page with trending, new, and personalised recipes
+""" 
+Display the explore page with trending, new, and personalised recipes
+"""
 def explore(request):
     base_qs = base_recipe_queryset(include_images=True)
 

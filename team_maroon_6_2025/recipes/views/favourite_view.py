@@ -8,7 +8,10 @@ from django.urls import reverse
 from recipes.models import Recipe
 from recipes.models.notification import Notification
 
-# Add or remove a recipe from the user's favourites
+""" 
+Toggle a recipe's favourite status for the authenticated user
+Adds or removes a recipe from the user's favourites colletion
+"""
 @login_required
 def toggle_favourite(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
