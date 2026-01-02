@@ -182,3 +182,66 @@ class RecipeEditViewTestCase(TestCase):
         response = self.client.get(self.url)
         redirect_url = reverse('log_in') + '?next=' + self.url
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+
+
+class RecipeDeleteViewTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='@deleter',
+            email='deleter@example.com',
+            password='Password123',
+            first_name='Del',
+            last_name='Eter',
+        )
+        self.other_user = User.objects.create_user(
+            username='@other',
+            email='other2@example.com',
+            password='Password123',
+            first_name='Other',
+            last_name='User',
+        )
+        self.recipe = Recipe.objects.create(
+            author=self.user,
+            title='Delete Me',
+            description='Desc',
+            ingredients='Eggs',
+            instructions='Cook',
+        )
+        self.url = reverse('recipe_delete', kwargs={'pk': self.recipe.pk})
+
+    def test_recipe_delete_requires_owner(self):
+        self.client.login(username='@other', password='Password123')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Recipe.objects.filter(pk=self.recipe.pk).exists())
+
+    def test_recipe_delete_removes_recipe(self):
+        self.client.login(username='@deleter', password='Password123')
+        response = self.client.post(self.url)
+        self.assertRedirects(response, reverse('recipe_list'))
+        self.assertFalse(Recipe.objects.filter(pk=self.recipe.pk).exists())
+
+
+class RecipeRateViewTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='@rater',
+            email='rater@example.com',
+            password='Password123',
+            first_name='Rate',
+            last_name='User',
+        )
+        self.recipe = Recipe.objects.create(
+            author=self.user,
+            title='Rate Me',
+            description='Desc',
+            ingredients='Eggs',
+            instructions='Cook',
+        )
+        self.url = reverse('recipe_rate', kwargs={'pk': self.recipe.pk})
+
+    def test_rate_recipe_creates_rating(self):
+        self.client.login(username='@rater', password='Password123')
+        response = self.client.post(self.url, {'rating': 4})
+        self.assertRedirects(response, reverse('recipe_detail', args=[self.recipe.pk]))
+        self.assertEqual(self.recipe.ratings.count(), 1)
