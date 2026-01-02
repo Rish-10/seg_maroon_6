@@ -3,8 +3,21 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.conf import settings
 
-# Model representing a user notification (follow, comment, favourite, etc.)
 class Notification(models.Model):
+    """
+    Model representing a user notification, for example for follows,
+    comments, favourites etc.
+
+    Fields:
+        recipient: The user that received the notification.
+        sender: The user that instigated the notification.
+        notification_type (CharField): The type of notification sent.
+        content_type: The content type of the object- used for notification filtering.
+        object_id (PositiveIntegerField): The id of the notification in the corresponding content table.
+        target_object: The target object that the notification should lead to when clicked.
+        created_at (DateTimeField): The date and time the notification was created.
+    """
+
     TYPES = [
         ('favourite', 'New Favourite'),
         ('comment', 'New Comment'),

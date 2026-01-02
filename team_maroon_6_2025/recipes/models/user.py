@@ -5,14 +5,25 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
 
-
 def validate_bio_lines(value):
     """Refuse input if it has more than 8 lines."""
     if len(value.splitlines()) > 8:
         raise ValidationError("Bio cannot exceed 8 lines.")
 
 class User(AbstractUser):
-    """Model used for user authentication, and team member related information."""
+    """
+    Model representing a user.
+
+        Fields:
+            username (CharField): The username of the user.
+            first_name (CharField): The first name of the user.
+            last_name (CharField): The last name of the user.
+            email (EmailField): The email address of the user.
+            favourites: Stores the recipes the user has favourited.
+            bio (TextField): The bio of the user.
+            following: Stores the users that the user follows.
+            is_private (BooleanField): Whether or not the user's account is set to private.
+    """
 
     username = models.CharField(
         max_length=30,
@@ -36,27 +47,22 @@ class User(AbstractUser):
         default=False,
         help_text="Your recipes will only be visible to followers. Other Recipify users will only be able to follow you once you approve their follow request.")
 
-
     class Meta:
         """Model options."""
-
         ordering = ['last_name', 'first_name']
 
     def full_name(self):
         """Return a string containing the user's full name."""
-
         return f'{self.first_name} {self.last_name}'
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
-
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
 
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
-        
         return self.gravatar(size=60)
 
     @property
@@ -70,7 +76,14 @@ class User(AbstractUser):
         return self.following.count()
 
 class FollowRequest(models.Model):
-    """ Model representing a follow request between users"""
+    """
+    Model representing a follow request from one user to another.
+
+        Fields:
+            follow_requester: The user that instigated the follow request.
+            requested_user: The user that received the follow request.
+            created_at (DateTimeField): The date and time of when the follow request was created.
+    """
     follow_requester = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_sent', on_delete=models.CASCADE)
     requested_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='requests_received', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
