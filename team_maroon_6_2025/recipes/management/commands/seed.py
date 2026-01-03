@@ -7,10 +7,15 @@ are left untouched—if a create fails (e.g., due to duplicates), the error
 is swallowed and generation continues.
 """
 
+import io
 from faker import Faker
-from random import randint
+from random import randint, choice
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
-from recipes.models import User
+from django.utils.text import slugify
+from PIL import Image
+
+from recipes.models import Category, Recipe, RecipeImage, User
 
 user_fixtures = [
     {
@@ -39,6 +44,19 @@ user_fixtures = [
     },
 ]
 
+CATEGORIES = [
+    ("vegan", "Vegan"),
+    ("vegetarian", "Vegetarian"),
+    ("pescatarian", "Pescatarian"),
+    ("gluten_free", "Gluten-Free"),
+    ("breakfast", "Breakfast"),
+    ("lunch", "Lunch"),
+    ("dinner", "Dinner"),
+    ("dessert", "Dessert"),
+    ("spicy", "Spicy"),
+    ("non_spicy", "Non-Spicy"),
+]
+
 
 class Command(BaseCommand):
     """
@@ -50,12 +68,14 @@ class Command(BaseCommand):
 
     Attributes:
         USER_COUNT (int): Target total number of users in the database.
+        RECIPE_COUNT (int): Number of recipes to generate.
         DEFAULT_PASSWORD (str): Default password assigned to all created users.
         help (str): Short description shown in ``manage.py help``.
         faker (Faker): Locale-specific Faker instance used for random data.
     """
 
     USER_COUNT = 200
+    RECIPE_COUNT = 50
     DEFAULT_PASSWORD = 'Password123'
     help = 'Seeds the database with sample data'
 
@@ -71,8 +91,23 @@ class Command(BaseCommand):
         Runs the full seeding workflow and stores ``self.users`` for any
         post-processing or debugging (not required for operation).
         """
+        self.seed_categories()
         self.create_users()
+        self.seed_recipes()
         self.users = User.objects.all()
+
+    def seed_categories(self):
+        """
+        Seed the default recipe categories.
+        """
+        created = 0
+        for key, label in CATEGORIES:
+            obj, was_created = Category.objects.get_or_create(key=key, defaults={"label": label})
+            if not was_created and obj.label != label:
+                obj.label = label
+                obj.save(update_fields=["label"])
+            created += int(was_created)
+        self.stdout.write(self.style.SUCCESS(f"Seeded categories (new: {created})."))
 
     def create_users(self):
         """
@@ -140,7 +175,7 @@ class Command(BaseCommand):
         email = create_email(first_name, last_name)
         username = create_username(first_name, last_name)
         self.try_create_user({'username': username, 'email': email, 'first_name': first_name, 'last_name': last_name})
-       
+
     def try_create_user(self, data):
         """
         Attempt to create a user and ignore any errors.
@@ -169,6 +204,59 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
+
+    def seed_recipes(self):
+        """
+        Generate random recipes using Faker.
+
+        Creates RECIPE_COUNT recipes with random titles, descriptions,
+        ingredients, and instructions.
+        """
+        users = list(User.objects.all())
+        if not users:
+            return
+
+        categories = list(Category.objects.all())
+        if not categories:
+            return
+
+        created = 0
+        for i in range(self.RECIPE_COUNT):
+            print(f"Seeding recipe {i+1}/{self.RECIPE_COUNT}", end='\r')
+
+            title = self.faker.catch_phrase()
+            description = self.faker.sentence(nb_words=10)
+
+            ingredient_count = randint(4, 8)
+            ingredients = [f"{randint(1, 3)} {self.faker.word()}" for _ in range(ingredient_count)]
+
+            instruction_count = randint(3, 6)
+            instructions = [self.faker.sentence(nb_words=8) for _ in range(instruction_count)]
+
+            author = choice(users)
+
+            recipe, was_created = Recipe.objects.get_or_create(
+                title=title,
+                defaults={
+                    "author": author,
+                    "description": description,
+                    "ingredients": "\n".join(ingredients),
+                    "instructions": "\n".join(instructions),
+                },
+            )
+
+            if was_created:
+                created += 1
+
+                recipe_categories = [choice(categories) for _ in range(randint(1, 3))]
+                recipe.categories.set(recipe_categories)
+
+                if not recipe.images.exists():
+                    img_file = create_placeholder_image(title)
+                    RecipeImage.objects.create(recipe=recipe, image=img_file, caption=title)
+
+        print(f"Recipe seeding complete (new: {created}).      ")
+
 
 def create_username(first_name, last_name):
     """
@@ -208,3 +296,11 @@ def _safe_token(value, default):
 def _rand_digits(count):
     """Generate a list of random digit characters."""
     return [str(randint(0, 9)) for _ in range(count)]
+
+
+def create_placeholder_image(text):
+    """Generate a simple placeholder image as ContentFile."""
+    img = Image.new("RGB", (800, 450), color=(230, 230, 230))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+    return ContentFile(buf.getvalue(), name=f"{slugify(text)}.jpg")
