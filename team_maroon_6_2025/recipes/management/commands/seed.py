@@ -136,20 +136,24 @@ class Command(BaseCommand):
                 "is_superuser": data.get("is_superuser", False),
             }
             user, created = User.objects.get_or_create(username=username, defaults=defaults)
-            changed = created
 
-            # Ensure fields and password are up to date for idempotency
-            for field, value in defaults.items():
-                if getattr(user, field) != value:
-                    setattr(user, field, value)
-                    changed = True
-
-            if not user.check_password(Command.DEFAULT_PASSWORD):
-                user.set_password(Command.DEFAULT_PASSWORD)
-                changed = True
-
+            changed = created or self._update_user_fields(user, defaults) or self._ensure_password(user)
             if changed:
                 user.save()
+
+    def _update_user_fields(self, user, defaults):
+        changed = False
+        for field, value in defaults.items():
+            if getattr(user, field) != value:
+                setattr(user, field, value)
+                changed = True
+        return changed
+
+    def _ensure_password(self, user):
+        if not user.check_password(Command.DEFAULT_PASSWORD):
+            user.set_password(Command.DEFAULT_PASSWORD)
+            return True
+        return False
 
     def generate_random_users(self):
         """
@@ -224,38 +228,42 @@ class Command(BaseCommand):
         for i in range(self.RECIPE_COUNT):
             print(f"Seeding recipe {i+1}/{self.RECIPE_COUNT}", end='\r')
 
-            title = self.faker.catch_phrase()
-            description = self.faker.sentence(nb_words=10)
-
-            ingredient_count = randint(4, 8)
-            ingredients = [f"{randint(1, 3)} {self.faker.word()}" for _ in range(ingredient_count)]
-
-            instruction_count = randint(3, 6)
-            instructions = [self.faker.sentence(nb_words=8) for _ in range(instruction_count)]
-
-            author = choice(users)
-
-            recipe, was_created = Recipe.objects.get_or_create(
-                title=title,
-                defaults={
-                    "author": author,
-                    "description": description,
-                    "ingredients": "\n".join(ingredients),
-                    "instructions": "\n".join(instructions),
-                },
-            )
+            recipe_data = self._build_recipe_data(choice(users))
+            recipe, was_created = Recipe.objects.get_or_create(title=recipe_data['title'], defaults=recipe_data['defaults'])
 
             if was_created:
                 created += 1
-
-                recipe_categories = [choice(categories) for _ in range(randint(1, 3))]
-                recipe.categories.set(recipe_categories)
-
-                if not recipe.images.exists():
-                    img_file = create_placeholder_image(title)
-                    RecipeImage.objects.create(recipe=recipe, image=img_file, caption=title)
+                self._add_recipe_extras(recipe, categories)
 
         print(f"Recipe seeding complete (new: {created}).      ")
+
+    def _build_recipe_data(self, author):
+        title = self.faker.catch_phrase()
+        description = self.faker.sentence(nb_words=10)
+
+        ingredient_count = randint(4, 8)
+        ingredients = "\n".join([f"{randint(1, 3)} {self.faker.word()}" for _ in range(ingredient_count)])
+
+        instruction_count = randint(3, 6)
+        instructions = "\n".join([self.faker.sentence(nb_words=8) for _ in range(instruction_count)])
+
+        return {
+            'title': title,
+            'defaults': {
+                'author': author,
+                'description': description,
+                'ingredients': ingredients,
+                'instructions': instructions,
+            }
+        }
+
+    def _add_recipe_extras(self, recipe, categories):
+        recipe_categories = [choice(categories) for _ in range(randint(1, 3))]
+        recipe.categories.set(recipe_categories)
+
+        if not recipe.images.exists():
+            img_file = create_placeholder_image(recipe.title)
+            RecipeImage.objects.create(recipe=recipe, image=img_file, caption=recipe.title)
 
 
 def create_username(first_name, last_name):
