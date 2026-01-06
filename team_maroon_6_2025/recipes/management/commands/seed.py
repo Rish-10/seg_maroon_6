@@ -136,7 +136,10 @@ class Command(BaseCommand):
             }
             user, created = User.objects.get_or_create(username=username, defaults=defaults)
 
-            changed = created or self.update_user_fields(user, defaults) or self.ensure_password(user)
+            user_fields_updated = self.update_user_fields(user, defaults)
+            password_updated = self.ensure_password(user)
+
+            changed = created or user_fields_updated or password_updated
             if changed:
                 user.save()
 
