@@ -2,10 +2,10 @@ from django.shortcuts import render
 from recipes.models import Category
 from recipes.helpers import base_recipe_queryset 
 
-""" 
-Display the explore page with trending, new, and personalised recipes
-"""
 def explore(request):
+    """
+    Display the explore page with trending, new, and personalised recipes
+    """
     base_qs = base_recipe_queryset(include_images=True)
 
     trending = list(base_qs.order_by("-favourites_total", "-rating_avg", "-created_at")[:6])

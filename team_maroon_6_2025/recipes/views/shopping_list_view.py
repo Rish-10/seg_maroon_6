@@ -6,23 +6,23 @@ from django.views.decorators.http import require_POST
 from recipes.forms import ShoppingListItemForm
 from recipes.models import Recipe, ShoppingListItem
 
-""" 
-Get cleaned ingredient lines from a recipe
-Helps parse the recipe's ingredients field, and yields each ingredient as a cleaned string
-"""
 def _ingredient_lines(recipe):
+    """
+    Get cleaned ingredient lines from a recipe
+    Helps parse the recipe's ingredients field, and yields each ingredient as a cleaned string
+    """
     for line in recipe.ingredients.splitlines():
         cleaned = line.strip().lstrip("-•").strip()
         if cleaned:
             yield cleaned
 
-"""
-Add all ingredients from a recipe to the user's shopping list
-Extracts all ingedients from a specified recipe and adds them to the user's shopping list
-"""
 @login_required
 @require_POST
 def shopping_list_add_recipe(request, pk):
+    """
+    Add all ingredients from a recipe to the user's shopping list
+    Extracts all ingedients from a specified recipe and adds them to the user's shopping list
+    """
     recipe = get_object_or_404(Recipe, pk=pk)
     added = 0
     for line in _ingredient_lines(recipe):
@@ -41,12 +41,12 @@ def shopping_list_add_recipe(request, pk):
     return redirect(next_url or "recipe_detail", pk=recipe.pk)
 
 
-"""
-Add a single item to the user's shopping list
-"""
 @login_required
 @require_POST
 def shopping_list_add_item(request):
+    """
+    Add a single item to the user's shopping list
+    """
     form = ShoppingListItemForm(request.POST)
     if form.is_valid():
         item = form.save(commit=False)
@@ -62,13 +62,13 @@ def shopping_list_add_item(request):
         section="shopping_list",
     )
 
-"""
-Toggle the checked state of the shopping list item
-Allows users to mark items as checked, or unchecked on their shopping list
-"""
 @login_required
 @require_POST
 def shopping_list_toggle_item(request, item_id):
+    """
+    Toggle the checked state of the shopping list item
+    Allows users to mark items as checked, or unchecked on their shopping list
+    """
     item = get_object_or_404(ShoppingListItem, id=item_id, user=request.user)
     item.is_checked = not item.is_checked
     item.save()
@@ -79,12 +79,12 @@ def shopping_list_toggle_item(request, item_id):
         section="shopping_list",
     )
 
-"""
-Remove an item from the user's shopping list
-"""
 @login_required
 @require_POST
 def shopping_list_delete_item(request, item_id):
+    """
+    Remove an item from the user's shopping list
+    """
     item = get_object_or_404(ShoppingListItem, id=item_id, user=request.user)
     item.delete()
     messages.success(request, "Item removed from your shopping list.")

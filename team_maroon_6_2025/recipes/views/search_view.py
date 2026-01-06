@@ -1,17 +1,16 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
-"""
-Redirect search queries to the appropriate page based on query type and context
-Manages query parameters, preserving all search filters 
-"""
 def search_redirect(request):
+    """
+    Redirect search queries to the appropriate page based on query type and context
+    Manages query parameters, preserving all search filters
+    """
     query = request.GET.get("q", "").strip()
     return_to = request.GET.get('return_to', '/')
 
     params = request.GET.copy()
     params.pop('return_to', None)
-
 
     encoded_parameters = params.urlencode()
 

@@ -5,11 +5,11 @@ from django.urls import reverse
 
 from recipes.models import Recipe
 
-""" 
-Toggle like status on a recipe
-""" 
 @login_required
 def toggle_like(request, pk):
+    """
+    Toggle like status on a recipe
+    """
     recipe = get_object_or_404(Recipe, pk=pk)
 
     if recipe.likes.filter(pk=request.user.pk).exists():

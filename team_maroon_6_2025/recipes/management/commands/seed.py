@@ -74,8 +74,8 @@ class Command(BaseCommand):
         faker (Faker): Locale-specific Faker instance used for random data.
     """
 
-    USER_COUNT = 200
-    RECIPE_COUNT = 50
+    USER_COUNT = 1000
+    RECIPE_COUNT = 500
     DEFAULT_PASSWORD = 'Password123'
     help = 'Seeds the database with sample data'
 
@@ -94,7 +94,6 @@ class Command(BaseCommand):
         self.seed_categories()
         self.create_users()
         self.seed_recipes()
-        self.users = User.objects.all()
 
     def seed_categories(self):
         """
@@ -137,11 +136,11 @@ class Command(BaseCommand):
             }
             user, created = User.objects.get_or_create(username=username, defaults=defaults)
 
-            changed = created or self._update_user_fields(user, defaults) or self._ensure_password(user)
+            changed = created or self.update_user_fields(user, defaults) or self.ensure_password(user)
             if changed:
                 user.save()
 
-    def _update_user_fields(self, user, defaults):
+    def update_user_fields(self, user, defaults):
         changed = False
         for field, value in defaults.items():
             if getattr(user, field) != value:
@@ -149,7 +148,7 @@ class Command(BaseCommand):
                 changed = True
         return changed
 
-    def _ensure_password(self, user):
+    def ensure_password(self, user):
         if not user.check_password(Command.DEFAULT_PASSWORD):
             user.set_password(Command.DEFAULT_PASSWORD)
             return True
@@ -228,16 +227,16 @@ class Command(BaseCommand):
         for i in range(self.RECIPE_COUNT):
             print(f"Seeding recipe {i+1}/{self.RECIPE_COUNT}", end='\r')
 
-            recipe_data = self._build_recipe_data(choice(users))
+            recipe_data = self.build_recipe_data(choice(users))
             recipe, was_created = Recipe.objects.get_or_create(title=recipe_data['title'], defaults=recipe_data['defaults'])
 
             if was_created:
                 created += 1
-                self._add_recipe_extras(recipe, categories)
+                self.add_recipe_extras(recipe, categories)
 
         print(f"Recipe seeding complete (new: {created}).      ")
 
-    def _build_recipe_data(self, author):
+    def build_recipe_data(self, author):
         title = self.faker.catch_phrase()
         description = self.faker.sentence(nb_words=10)
 
@@ -257,7 +256,7 @@ class Command(BaseCommand):
             }
         }
 
-    def _add_recipe_extras(self, recipe, categories):
+    def add_recipe_extras(self, recipe, categories):
         recipe_categories = [choice(categories) for _ in range(randint(1, 3))]
         recipe.categories.set(recipe_categories)
 
@@ -272,11 +271,11 @@ def create_username(first_name, last_name):
 
     Adds a numeric suffix to avoid collisions and trims to fit the 30-char limit.
     """
-    base = _safe_token(first_name, "user") + _safe_token(last_name, "seed")
+    base = safe_token(first_name, "user") + safe_token(last_name, "seed")
     if len(base) < 3:
-        base += "".join(_rand_digits(3))
+        base += "".join(rand_digits(3))
     base = base[:23]  # leave space for @ and a 3-digit suffix
-    suffix = "".join(_rand_digits(3))
+    suffix = "".join(rand_digits(3))
     username = f"@{base}{suffix}"
     return username[:30]
 
@@ -290,18 +289,18 @@ def create_email(first_name, last_name):
     Returns:
         str: An email in the form ``{firstname}.{lastname}{rand}@example.org``.
     """
-    local = f"{_safe_token(first_name, 'user')}.{_safe_token(last_name, 'seed')}".strip(".")
+    local = f"{safe_token(first_name, 'user')}.{safe_token(last_name, 'seed')}".strip(".")
     local = local or "user.seed"
     return f"{local}{randint(1000,9999)}@example.org"
 
 
-def _safe_token(value, default):
+def safe_token(value, default):
     """Return only alphanumerics from value; fall back to default if empty."""
     cleaned = "".join(ch for ch in value.lower() if ch.isalnum())
     return cleaned or default
 
 
-def _rand_digits(count):
+def rand_digits(count):
     """Generate a list of random digit characters."""
     return [str(randint(0, 9)) for _ in range(count)]
 

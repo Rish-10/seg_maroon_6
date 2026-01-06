@@ -18,6 +18,7 @@ def base_recipe_queryset(*, include_comments = False, include_images = False):
         prefetches += ["comments", "comments__author"]
     if include_images:
         prefetches += ["images"]
+
     return (
         Recipe.objects.select_related("author")
         .prefetch_related(*prefetches)
@@ -32,9 +33,11 @@ def base_recipe_queryset(*, include_comments = False, include_images = False):
 def attach_user_ratings(recipes, user):
     if not user.is_authenticated:
         return
+
     recipes = list(recipes)
     if not recipes: 
-        return 
+        return
+
     recipe_ids = {r.id for r in recipes}
     rating_map = dict(
         RecipeRating.objects.filter(user=user, recipe_id__in=recipe_ids)

@@ -6,11 +6,11 @@ from recipes.models import FollowRequest, User
 from recipes.models.notification import Notification
 from recipes.search_filters import filter_recipes
 
-"""
-Display a user's profile page with recipes, follow status, and privacy handling
-For private accounts, it restricts content visibility to followers and the profile owner
-"""
 def profile_page(request, username, section="posted_recipes"):
+    """
+    Display a user's profile page with recipes, follow status, and privacy handling
+    For private accounts, it restricts content visibility to followers and the profile owner
+    """
     profile_user = get_object_or_404(User, username=username)
 
     current_user = request.user
@@ -81,11 +81,11 @@ def profile_page(request, username, section="posted_recipes"):
     }
     return render(request, "users/profile_page.html", context)
 
-""" 
-Follow or unfollow a user, or send/cancel a follow request based on the account's privacy settings
-"""
 @login_required
 def follow_toggle(request, username):
+    """
+    Follow or unfollow a user, or send/cancel a follow request based on the account's privacy settings
+    """
     user_to_follow = get_object_or_404(User, username=username)
     following_user = request.user
 
@@ -131,11 +131,11 @@ def follow_toggle(request, username):
 
     return redirect("profile_page", username=username)
 
-"""
-Accept a pending follow request
-"""
 @login_required
 def accept_follow_request(request, username):
+    """
+    Accept a pending follow request
+    """
     user_to_follow = request.user
     follow_request = get_object_or_404(
         FollowRequest,
@@ -146,11 +146,11 @@ def accept_follow_request(request, username):
     follow_request.delete()
     return redirect("profile_page", username=username)
 
-"""
-Decline a pending follow request
-"""
 @login_required
 def decline_follow_request(request, username):
+    """
+    Decline a pending follow request
+    """
     user_to_follow = request.user
     follow_request = get_object_or_404(
         FollowRequest,
@@ -160,10 +160,10 @@ def decline_follow_request(request, username):
     follow_request.delete()
     return redirect("profile_page", username=username)
 
-""" 
-Display a list of followers or followed users
-"""
 def follow_list(request, username, relation):
+    """
+    Display a list of followers or followed users
+    """
     
     profile_user = get_object_or_404(User, username=username)
     current_user = request.user

@@ -3,11 +3,11 @@ from django.urls import reverse
 
 from recipes.search_filters import filter_users
 
-"""
-Search for users by username and redirect if only one result is found
-Applies search filters to find matching users 
-"""
 def profile_search(request):
+    """
+    Search for users by username and redirect if only one result is found
+    Applies search filters to find matching users
+    """
     users = filter_users(request)
     if users.count() == 1:
         username = users.first().username

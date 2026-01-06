@@ -20,22 +20,19 @@ RecipeImageFormSet = inlineformset_factory(
     extra=3,
     can_delete=True,
 )
-"""
-Display the recipe list with filtering, sorting, pagination, and following feed
-Serves as the main recipe browsing interface, supporting multiple features: supporting multiple features:
-filtering by categories and search terms, sorting by various criteria (newest, popular, highest rated),
-and pagination with 10 recipes per page. For authenticated users, it
-generates an additional "following feed" containing recipes from users they follow,
-displayed separately from the main feed.
-"""
+
 def recipe_list(request):
+    """
+    Display the recipe list with filtering, sorting, pagination, and following feed
+    Serves as the main recipe browsing interface, supporting multiple features: supporting multiple features:
+    filtering by categories and search terms, sorting by various criteria (newest, popular, highest rated),
+    and pagination with 10 recipes per page. For authenticated users, it
+    generates an additional "following feed" containing recipes from users they follow,
+    displayed separately from the main feed.
+    """
     sort = request.GET.get("sort", "newest")
     ordering = RECIPE_ORDERING.get(sort, ("-created_at",))
-
-
-    recipes_qs = filter_recipes(request, base_recipe_queryset(include_comments=True))
-
-    recipes_qs = recipes_qs.distinct()
+    recipes_qs = filter_recipes(request, base_recipe_queryset(include_comments=True)).distinct()
 
     paginator = Paginator(recipes_qs.order_by(*ordering), 10)
     page_number = request.GET.get("page") or 1
@@ -52,9 +49,7 @@ def recipe_list(request):
                 .order_by(*ordering)
             )
 
-
     attach_user_ratings(chain(feed_recipes, following_recipes), request.user)
-
     categories = Category.objects.order_by("label")
 
     return render(
@@ -69,10 +64,11 @@ def recipe_list(request):
             "query": request.GET.get("q", ""),
         },
     )
-"""
-Display a single recipe with comments, rating information, and user information
-"""
+
 def recipe_detail(request, pk):
+    """
+    Display a single recipe with comments, rating information, and user information
+    """
     recipe = get_object_or_404(Recipe, pk=pk)
     comments = recipe.comments.select_related("author")
 
@@ -101,10 +97,10 @@ def recipe_detail(request, pk):
 
     return render(request, "recipes/recipe_detail.html", context)
 
-"""
-Create a new recipe with optional images
-"""
 def recipe_create(request):
+    """
+    Create a new recipe with optional images
+    """
     if request.method == "POST":
         form = RecipeForm(request.POST)
         formset = RecipeImageFormSet(request.POST, request.FILES)
@@ -130,11 +126,11 @@ def recipe_create(request):
         },
     )
 
-"""
-Edit an existing recipe owned by the current user
-"""
 @login_required
 def recipe_edit(request, pk):
+    """
+    Edit an existing recipe owned by the current user
+    """
     recipe = get_object_or_404(Recipe, pk=pk)
 
     if recipe.author != request.user:
@@ -162,12 +158,12 @@ def recipe_edit(request, pk):
         },
     )
 
-"""
-Delete an existing recipe owned by the current user
-"""
 @login_required
 @require_POST
 def recipe_delete(request, pk):
+    """
+    Delete an existing recipe owned by the current user
+    """
     recipe = get_object_or_404(Recipe, pk=pk)
 
     if recipe.author != request.user:
@@ -179,11 +175,12 @@ def recipe_delete(request, pk):
     next_url = request.POST.get("next") or reverse("recipe_list")
     return redirect(next_url)
 
-"""
-Save or update a user's rating for a recipe
-"""@login_required
+@login_required
 @require_POST
 def rate_recipe(request, pk):
+    """
+    Save or update a user's rating for a recipe
+    """
     recipe = get_object_or_404(Recipe, pk=pk)
     form = RecipeRatingForm(request.POST)
 

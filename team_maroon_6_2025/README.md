@@ -60,9 +60,7 @@ Generative AI Use:
 `recipe_form.py`
 class RecipeForm: 15 lines; less than 50% of the unit.
 
-`seed_recipes.py`
-list SAMPLE_RECIPES: 350 lines; whole unit.
-function create_placeholder_image: 5 lines; whole unit.
+`seed.py`
 class Command: 50 lines; more than 50% of the unit.
 
 `user.py`
@@ -124,4 +122,12 @@ function dashboard: 30 lines; about 50% of the unit.
 
 `favourite_view.py`: 20 lines; less than 50% of the unit.
 
-`profile_page_view.py`: 
+`profile_page_view.py`
+function profile_page: 60 lines; more than 50% of the unit.
+function follow_toggle: 30 lines; about 50% of the unit.
+
+`profile_view.py`
+function form_valid: 10 lines; less than 50% of the unit.
+
+`recipe_view.py`
+function recipe_list: 10 lines; less than 50% of the unit.
